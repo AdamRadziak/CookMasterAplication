@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/backMenuItem"
+        android:icon="@drawable/arrow_back_icon"
+        android:title="Back"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/findRecipeMenuItem"
+        android:icon="@drawable/search_icon"
+        android:title="Znajdź przepis"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/createMenuItem"
+        android:icon="@drawable/restaurant_menu_icon"
+        android:title="Utwórz menu"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/savedMenusMenuItem"
+        android:icon="@drawable/menu_book_icon"
+        android:title="@string/menu_item_menus"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/favouritesMenuItem"
+        android:icon="@drawable/favorite_icon"
+        android:title="@string/menu_item_favourites"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/accountSettingsMenuItem"
+        android:icon="@drawable/manage_accounts_icon"
+        android:title="@string/menu_item_account_settings"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/signOutMenuItem"
+        android:enabled="true"
+        android:icon="@drawable/logout_icon"
+        android:title="@string/menu_item_Sign_out"
+        app:showAsAction="always" />
+</menu>

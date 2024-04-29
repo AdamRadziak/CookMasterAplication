@@ -1,0 +1,14 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.CookMasterAplication" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
+        <item name="colorOnPrimary">@color/colorOnPrimaryDark</item>
+        <item name="colorSecondary">@color/colorSecondaryDark</item>
+        <item name="colorOnSecondary">@color/colorOnSecondaryDark</item>
+
+        <item name="android:colorBackground">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?attr/colorSecondary</item>
+        <item name="android:navigationBarColor">?attr/colorSecondary</item>
+        <item name="fontFamily">monospace</item>
+    </style>
+</resources>

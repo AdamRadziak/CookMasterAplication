@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CookMasterAplication"
+        tools:targetApi="31">
+        <activity
+            android:name=".Views.SavedMenuDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.RecipeDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.FavouritesRecipesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.SavedMenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.AccountSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.FindRecipeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.CreateMenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.PasswordReminderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.RegistrationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

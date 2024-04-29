@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/userSettLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Views.AccountSettingsActivity"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarLogoAccountSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ToolBarLogo" />
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarMenuAccountSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ToolBarMenu" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/AccountSettLinLay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <EditText
+            android:id="@+id/editTextPassAccountSet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:ems="10"
+            android:hint="@string/password"
+            android:inputType="text|textPassword"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/buttonChangePass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Zmień hasło"
+            android:textColor="@color/black"
+            android:theme="@style/PrimaryButton" />
+
+        <Button
+            android:id="@+id/buttonDelteAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Usuń konto"
+            android:textColor="@color/black"
+            android:theme="@style/PrimaryButton" />
+    </LinearLayout>
+
+
+</LinearLayout>

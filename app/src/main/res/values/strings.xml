@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Cook Master</string>
+    <string name="sign_in">Zaloguj się</string>
+    <string name="email">email</string>
+    <string name="password">hasło</string>
+    <string name="send_password">Wyślij hasło</string>
+    <string name="registerUser">Rejestracja</string>
+    <string name="back">Wstecz</string>
+    <string name="pass_remind">Przypomnienie hasła</string>
+    <string name="menu_item_menus">Zapisane menu</string>
+    <string name="menu_item_favourites">Ulubione przepisy</string>
+    <string name="menu_item_account_settings">Ustawienia konta</string>
+    <string name="menu_item_Sign_out">Wyloguj się</string>
+    <string name="nazwa_menu">Nazwa menu</string>
+    <string-array name="DaysCount">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>7</item>
+    </string-array>
+    <string-array name="MealCount">
+        <item>2</item>
+        <item>4</item>
+        <item>6</item>
+        <item>8</item>
+    </string-array>
+    <string-array name="MealPrepareTime">
+        <item>30 min</item>
+        <item>40 min</item>
+        <item>60 min</item>
+        <item>90 min</item>
+        <item>120 min</item>
+    </string-array>
+    <string-array name="MealRate">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="MealPopularity">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>
