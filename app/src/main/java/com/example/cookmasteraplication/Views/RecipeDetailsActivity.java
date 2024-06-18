@@ -59,7 +59,9 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         favouriteBtn.setOnClickListener(v -> controller.saveToFavourites());
         ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
             ratingBar.setMax(5);
-            controller.rate(rating);
+            ratingBar.setNumStars(5);
+            ratingBar.setStepSize(0.5F);
+            controller.rateRecipe(rating);
         });
         controller.setName(recipeName);
         controller.setMealCount(mealCount);

@@ -174,18 +174,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginLeft="20dp"
                     android:gravity="center_vertical"
-                    android:text="Szukaj"
-                    android:textColor="@color/black"
-                    android:theme="@style/PrimaryButton" />
-
-                <Button
-                    android:id="@+id/buttonSaveMenu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="20dp"
-                    android:gravity="center"
-                    android:text="Zapisz"
+                    android:text="Wyszukaj i zapisz"
                     android:textColor="@color/black"
                     android:theme="@style/PrimaryButton" />
 

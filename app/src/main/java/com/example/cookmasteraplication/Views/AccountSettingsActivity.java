@@ -15,10 +15,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.cookmasteraplication.Controlers.AccountSettingsControler;
-import com.example.cookmasteraplication.Models.SharedPreferencesActivities;
+import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.snackbar.Snackbar;
 
 public class AccountSettingsActivity extends AppCompatActivity {
 
@@ -60,8 +59,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
                 password.setHint("Hasło nie może być puste");
             }else{
             intentPassChange.putExtra("newPass",passwordText);
-            String userEmail = sharedPref.retrieveData("userEmail");
-            controler.changePassword(userEmail,intentPassChange,layout);
+            controler.changePassword(intentPassChange);
             }
         });
 

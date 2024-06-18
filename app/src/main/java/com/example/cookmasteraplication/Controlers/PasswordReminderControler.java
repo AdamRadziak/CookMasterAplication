@@ -4,22 +4,32 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.cookmasteraplication.Models.AccountInfoModel;
-import com.example.cookmasteraplication.Models.ToolBarModel;
+import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
+import com.example.cookmasteraplication.Helpers.ToolBarModel;
+import com.example.cookmasteraplication.Utils.CommonTools;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.PasswordReminderActivity;
+import com.example.cookmasteraplication.api.Models.UserAccount;
+import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+
 public class PasswordReminderControler {
 
-    private final AccountInfoModel model;
     private final PasswordReminderActivity activity;
+    private final SharedPreferencesActivities sharedPref;
+    private Retrofit retrofitClient;
 
 
     public PasswordReminderControler(PasswordReminderActivity activity) {
-        this.model = new AccountInfoModel();
         this.activity = activity;
+        this.sharedPref = new SharedPreferencesActivities(this.activity);
     }
 
     public void goBackLoginPage() {
@@ -28,22 +38,53 @@ public class PasswordReminderControler {
     }
 
     public void SendEmail(EditText userEmail, View layout) {
-        String message = "";
-        String email = userEmail.getText().toString();
-        // send email by post request
-        // server returns status code 200 and then show snackbar message with message
-        // password is sent to email from inputText
-        // if email is not null and request status code is 200
-        if (!email.isEmpty()) {
-            message = "Hasło wysłano na maila " + email;
+        String email_get = userEmail.getText().toString();
+
+        if (!email_get.isEmpty()) {
+            // get password by request
+            String emailHash = CommonTools.encode2Base64String(email_get);
+            // create connection to api
+            retrofitClient = BaseClient.get_client();
+            IUserAccountService client = retrofitClient.create(IUserAccountService.class);
+            Call<UserAccount> call = client.GetUserPassByEmail(emailHash);
+
+            call.enqueue(new Callback<UserAccount>() {
+                @Override
+                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
+                    if(response.code() == 200){
+                        // add to shared preferences class
+                        UserAccount body = response.body();
+                        String emailDecode = CommonTools.decodeFromBase64String(body.getEmail());
+                        String passDecode = CommonTools.decodeFromBase64String(body.getPassword());
+                        sharedPref.saveData("emailRemind",emailDecode);
+                        sharedPref.saveData("passRemind",passDecode);
+                        Snackbar.make(layout, "hasło i email zostały przesłane na stronę logowania" , Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Close", v -> {
+
+                                }).show();
+                    }else {
+                        Snackbar.make(layout, "błąd" + response.message(), Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Close", v -> {
+
+                                }).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserAccount> call, Throwable throwable) {
+                    Snackbar.make(layout, "błąd" + throwable.getMessage(), Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Close", v -> {
+
+                            }).show();
+                }
+            });
 
         } else {
-            message = "Nieprawidłowy email";
-        }
-        Snackbar.make(layout, message, Snackbar.LENGTH_INDEFINITE)
-                .setAction("Close", v -> {
+            Snackbar.make(layout, "nie wpisano maila", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Close", v -> {
 
-                }).show();
+                    }).show();
+        }
     }
 
     public void setToolbar(MaterialToolbar toolbar, String pageName) {

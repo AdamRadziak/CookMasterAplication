@@ -1,28 +1,31 @@
 package com.example.cookmasteraplication.Controlers;
 
-import static com.example.cookmasteraplication.Controlers.LoginPageControler.users;
-
 import android.content.Intent;
-import android.text.Layout;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
 
-import com.example.cookmasteraplication.Models.AccountInfoModel;
-import com.example.cookmasteraplication.Models.ToolBarModel;
+import androidx.annotation.NonNull;
+
+import com.example.cookmasteraplication.Helpers.ToolBarModel;
+import com.example.cookmasteraplication.Utils.CommonTools;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.RegistrationActivity;
+import com.example.cookmasteraplication.api.Models.UserAccount;
+import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
-public class RegistrationControler {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
-    private final AccountInfoModel model;
+public class RegistrationControler {
     private final RegistrationActivity activity;
 
     public RegistrationControler(RegistrationActivity activity) {
-        this.model = new AccountInfoModel();
         this.activity = activity;
+
     }
 
     public void goBackLoginPage() {
@@ -30,43 +33,53 @@ public class RegistrationControler {
         activity.startActivity(intent);
     }
 
+
     public void sendRegisterUserData(Intent intent, View layout) {
         String email_get = intent.getStringExtra("email");
         String password_get = intent.getStringExtra("pass");
-        boolean isEmailRegistered = false;
-        // send user data password and email by post request
-        // server returns status code 200 and then show snackbar message with message
-        // password is sent to email from inputText
-        // if email is not null and request status code is 200
-        for(AccountInfoModel user:users){
-            String email = user.email;
-            if(email_get.equals(email)){
-                Snackbar.make(layout,"Email " + email + " istnieje",Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Zamknij", v -> {
+        // encode pass and email to base64
+        if (email_get != null && password_get != null) {
+            String emailHash = CommonTools.encode2Base64String(email_get);
+            String passwordHash = CommonTools.encode2Base64String(password_get);
+            UserAccount userAccount = new UserAccount(emailHash, passwordHash);
+            // create connection to api
+            Retrofit retrofitClient = BaseClient.get_client();
+            IUserAccountService client = retrofitClient.create(IUserAccountService.class);
+            Call<UserAccount> call = client.CreateAccount(userAccount);
 
-                        }).show();
-                isEmailRegistered = true;
+            call.enqueue(new Callback<UserAccount>() {
+                @Override
+                public void onResponse(@NonNull Call<UserAccount> call, @NonNull Response<UserAccount> response) {
+                    if(response.code() == 201){
+                    UserAccount body = response.body();
+                    Snackbar.make(layout, "Utworzono użytkownika o nazwie " + email_get, Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Zamknij", v -> {
 
-            }
+                            }).show();}
+                    else{
+                        Snackbar.make(layout, "NIe utworzono użytkownika " + email_get + " " + response.message(), Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Zamknij", v -> {
 
-            }
-        if(!isEmailRegistered && !password_get.isEmpty()){
-            AccountInfoModel newUser = new AccountInfoModel();
-            newUser.setEmail(email_get);
-            newUser.setPassword(password_get);
-            Snackbar.make(layout,"Utworzono nowego użytkwonika o emailu  " + email_get ,Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Zamknij", v -> {
+                                }).show();}
+                    }
+                @Override
+                public void onFailure(@NonNull Call<UserAccount> call, @NonNull Throwable t) {
+                    Snackbar.make(layout, "Niepowodzenie w rejestracji użytkownika" + email_get + " " + t.getMessage(), Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Zamknij", v -> {
 
-                    }).show();
-            users.add(newUser);
-        } else if (password_get.isEmpty()) {
-            Snackbar.make(layout,"Brak wpisanego hasła  " + email_get ,Snackbar.LENGTH_INDEFINITE)
+                            }).show();
+                    call.cancel();
+                }
+            });
+        } else {
+            Snackbar.make(layout, "Brak wpisanego hasła lub maila ", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Zamknij", v -> {
 
                     }).show();
         }
 
-        }
+
+    }
 
     public void setToolbar(MaterialToolbar toolbar, String pageName) {
         ToolBarModel toolbarmodel = new ToolBarModel.Builder(activity,

@@ -1,29 +1,36 @@
 package com.example.cookmasteraplication.Controlers;
 
-import static com.example.cookmasteraplication.Controlers.LoginPageControler.users;
-
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.example.cookmasteraplication.Models.AccountInfoModel;
-import com.example.cookmasteraplication.Models.ToolBarModel;
+import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
+import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.R;
+import com.example.cookmasteraplication.Utils.CommonTools;
 import com.example.cookmasteraplication.Views.AccountSettingsActivity;
 import com.example.cookmasteraplication.Views.LoginActivity;
+import com.example.cookmasteraplication.api.Models.UserAccount;
+import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Iterator;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class AccountSettingsControler {
 
     AccountSettingsActivity activity;
+    SharedPreferencesActivities sharedPref;
+    Retrofit retrofitClient;
 
     public AccountSettingsControler(AccountSettingsActivity activity) {
         this.activity = activity;
+        this.sharedPref = new SharedPreferencesActivities(this.activity);
     }
 
     public void setToolbarLogo(MaterialToolbar toolbar, String pageName) {
@@ -36,34 +43,93 @@ public class AccountSettingsControler {
                 toolbar).create().setMenuOItemOnClickListeners().build();
     }
 
-    public boolean changePassword(String userEmail, Intent intentPass, View layout) {
-        boolean isPasswordChanged = false;
+    public boolean changePassword(Intent intentPass) {
+        final boolean[] isPasswordChanged = {false};
         String pass_get = intentPass.getStringExtra("newPass");
-        for (AccountInfoModel user : users) {
-            String email = user.email;
-            if (userEmail.equals(email)) {
-                Snackbar.make(layout, "Zmieniono hasło do konta o emailu " + email, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Zamknij", v -> {
+        // get api to update the password
+        if (pass_get != null) {
+            String NewpassEncode = CommonTools.encode2Base64String(pass_get);
+            String emailEncode = CommonTools.encode2Base64String(sharedPref.retrieveData("UserEmail"));
+            // retreive data by sharedPreferences
+            UserAccount userAccount = new UserAccount(emailEncode, NewpassEncode);
+            retrofitClient = BaseClient
+                    .get_AuthClient(sharedPref.retrieveData("UserEmail"),
+                            sharedPref.retrieveData("UserPass"));
+            IUserAccountService client = retrofitClient.create(IUserAccountService.class);
+            Call<UserAccount> call = client.UpdateUserPass(userAccount,
+                    Integer.parseInt(sharedPref.retrieveData("UserId")));
+            call.enqueue(new Callback<UserAccount>() {
+                @Override
+                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
+                    if (response.code() == 200) {
+                        Toast.makeText(activity.getApplicationContext(),
+                                "Pomyślnie zmieniono hasło dla użytkownika " +
+                                        sharedPref.retrieveData("UserEmail"),
+                                Toast.LENGTH_LONG).show();
+                        isPasswordChanged[0] = true;
+                        // add to sharedPreferences class new value of password
+                        sharedPref.saveData("UserPass",pass_get);
 
-                        }).show();
-                user.setPassword(pass_get);
-                isPasswordChanged = true;
-            }
+                    } else {
+                        Toast.makeText(activity.getApplicationContext(),
+                                "Błąd " + response.message(), Toast.LENGTH_LONG).show();
+                        isPasswordChanged[0] = false;
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserAccount> call, Throwable throwable) {
+                    Toast.makeText(activity.getApplicationContext(),
+                            "Błąd " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                    isPasswordChanged[0] = false;
+                }
+            });
 
 
         }
-        return isPasswordChanged;
+        return isPasswordChanged[0];
     }
 
     private void deleteAccount(String userEmail) {
-        for (Iterator<AccountInfoModel> it = users.iterator(); it.hasNext();) {
-            String email = it.next().getEmail();
-            if (email.equals(userEmail)) {
-                // remove iterator and element of arraylist
-                it.remove();
-                Intent goToLoginPage = new Intent(activity.getApplicationContext(), LoginActivity.class);
-                activity.startActivity(goToLoginPage);
-            }
+        if (userEmail != null) {
+            // use api to delete user
+            Integer UserId = Integer.parseInt(sharedPref.retrieveData("UserId"));
+            retrofitClient = BaseClient
+                    .get_AuthClient(sharedPref.retrieveData("UserEmail"),
+                            sharedPref.retrieveData("UserPass"));
+            IUserAccountService client = retrofitClient.create(IUserAccountService.class);
+            Call<UserAccount> call = client.DeleteUser(UserId);
+            call.enqueue(new Callback<UserAccount>() {
+                @Override
+                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
+                    if (response.code() == 204) {
+                        Toast.makeText(activity.getApplicationContext(),
+                                "Pomyślnie usunięto użytkownika nastąpi wylogowanie za 2 s",
+                                Toast.LENGTH_LONG).show();
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        // go to login page
+                        Intent loginPageIntent = new Intent(activity.getApplicationContext(),
+                                LoginActivity.class);
+                        activity.startActivity(loginPageIntent);
+                    } else {
+                        Toast.makeText(activity.getApplicationContext(),
+                                "błąd " + response.message(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserAccount> call, Throwable throwable) {
+                    Toast.makeText(activity.getApplicationContext(),
+                            "błąd " + throwable.getMessage(),
+                            Toast.LENGTH_LONG).show();
+
+                }
+            });
 
 
         }

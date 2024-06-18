@@ -1,4 +1,4 @@
-package com.example.cookmasteraplication.Models.Adapters;
+package com.example.cookmasteraplication.Adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,39 +11,43 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.cookmasteraplication.Models.ProductModel;
 import com.example.cookmasteraplication.R;
+import com.example.cookmasteraplication.api.Models.Step;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class RecyclerAdapterProduct extends RecyclerView.Adapter<RecyclerAdapterProduct.MenuViewHolder> {
+public class RecyclerAdapterStep extends RecyclerView.Adapter<RecyclerAdapterStep.MenuViewHolder> {
 
-    private final ArrayList<ProductModel> productList;
     private final AppCompatActivity activity;
+    private final ArrayList<Step> steps;
 
-    public RecyclerAdapterProduct(ArrayList<ProductModel> productList, AppCompatActivity activity) {
-        this.productList = productList;
+    public RecyclerAdapterStep(ArrayList<Step> steps, AppCompatActivity activity) {
+        this.steps = steps;
         this.activity = activity;
     }
 
     @NonNull
     @Override
     public MenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_card, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.step_card, parent, false);
 
         return new MenuViewHolder(view);
     }
 
     @Override
     public int getItemCount() {
-        return productList.size();
+        return steps.size();
     }
 
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
-        ProductModel customMenuItem = productList.get(position);
-        holder.name.setText(customMenuItem.getName());
-        holder.amount.setText(customMenuItem.getAmount());
+        Step stepItem = steps.get(position);
+        String stepDescription = stepItem.getDescription();
+        Integer stepNumber = stepItem.getStepNum();
+        String stepNumberString = " " + String.format(Locale.ENGLISH, "%d", stepNumber);
+        holder.number.setText(stepNumberString);
+        holder.desc.setText(stepDescription);
         // set background color
         if (position % 2 == 0) {
             holder.layout.setBackgroundColor(ContextCompat.getColor(activity.getApplicationContext(), R.color.colorOnPrimaryLight));
@@ -56,16 +60,16 @@ public class RecyclerAdapterProduct extends RecyclerView.Adapter<RecyclerAdapter
 
     public class MenuViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView name;
-        private final TextView amount;
+        private final TextView number;
+        private final TextView desc;
         private final LinearLayout layout;
 
         public MenuViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            name = itemView.findViewById(R.id.textViewProdName);
-            amount = itemView.findViewById(R.id.textViewProdAmount);
-            layout = itemView.findViewById(R.id.productRow);
+            number = itemView.findViewById(R.id.textViewStepNum);
+            desc = itemView.findViewById(R.id.textViewStepDesc);
+            layout = itemView.findViewById(R.id.Step_layout);
 
 
         }

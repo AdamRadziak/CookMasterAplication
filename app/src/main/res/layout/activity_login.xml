@@ -55,6 +55,14 @@
         android:theme="@style/PrimaryButton"
         app:toggleCheckedStateOnClick="true" />
 
+    <ProgressBar
+        android:id="@+id/progressBarLogin"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="invisible"/>
+
     <TextView
         android:id="@+id/textViewReg"
         android:layout_width="wrap_content"
@@ -88,6 +96,7 @@
         android:textColor="@color/black"
         android:theme="@style/PrimaryButton"
         app:toggleCheckedStateOnClick="true" />
+
 </LinearLayout>
 
 

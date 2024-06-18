@@ -66,7 +66,7 @@ public class FindRecipeActivity extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                controller.searchProducts();
+                controller.searchRecipesByProducts();
                 controller.setRecyclerView(recipeList);
             }
         });

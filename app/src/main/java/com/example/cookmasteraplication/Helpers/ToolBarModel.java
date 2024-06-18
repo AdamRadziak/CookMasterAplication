@@ -1,4 +1,4 @@
-package com.example.cookmasteraplication.Models;
+package com.example.cookmasteraplication.Helpers;
 
 import android.content.Intent;
 import android.widget.Toast;

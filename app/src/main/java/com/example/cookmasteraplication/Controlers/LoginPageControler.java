@@ -4,24 +4,35 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.example.cookmasteraplication.Models.AccountInfoModel;
-import com.example.cookmasteraplication.Models.ToolBarModel;
-import com.example.cookmasteraplication.Views.AccountSettingsActivity;
+import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
+import com.example.cookmasteraplication.Helpers.ToolBarModel;
+import com.example.cookmasteraplication.Utils.CommonTools;
 import com.example.cookmasteraplication.Views.CreateMenuActivity;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.PasswordReminderActivity;
 import com.example.cookmasteraplication.Views.RegistrationActivity;
+import com.example.cookmasteraplication.api.Models.UserAccount;
+import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class LoginPageControler {
 
     public static ArrayList<AccountInfoModel> users = new ArrayList<>();
     private final LoginActivity activity;
+    private final SharedPreferencesActivities sharedPref;
+
 
     public LoginPageControler(LoginActivity activity) {
         this.activity = activity;
-        createSampleAccount();
+        this.sharedPref = new SharedPreferencesActivities(this.activity);
     }
 
     public void goToRegisterPage() {
@@ -35,43 +46,58 @@ public class LoginPageControler {
     }
 
     public boolean goToMainPage(Intent intent) {
-        boolean isLogin = false;
+        final boolean[] isLogin = {true};
         int statusCode;
         // verify that email and password is correct
         String email_get = intent.getStringExtra("email");
         String password_get = intent.getStringExtra("pass");
-        for(AccountInfoModel user:users){
-            String email = user.email;
-            String passw = user.password;
-            if(email_get.equals(email)){
-                if(password_get.equals(passw)){
-                    Toast.makeText(activity.getApplicationContext(),"Poprawnie zalogowano",Toast.LENGTH_SHORT).show();
-                    isLogin = true;
-                    Intent MainPageIntent = new Intent(activity.getApplicationContext(), CreateMenuActivity.class);
-//                    Intent accountSettingsIntent = new Intent(activity.getApplicationContext(), AccountSettingsActivity.class);
-//                    accountSettingsIntent.putExtra("userEmail",email);
-                    activity.startActivity(MainPageIntent);
+        if (email_get != null && password_get != null) {
+            // authorize by headers
+            Retrofit retrofitClient = BaseClient.get_AuthClient(email_get, password_get);
+            IUserAccountService client = retrofitClient.create(IUserAccountService.class);
+            // encode usermeail nad userpass
+            String passEncode = CommonTools.encode2Base64String(password_get);
+            String emailEncode = CommonTools.encode2Base64String(email_get);
+            Call<UserAccount> call = client.LogIn(emailEncode, passEncode);
+            call.enqueue(new Callback<UserAccount>() {
+                @Override
+                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
+                    if (response.code() == 200) {
+                        // add to GetUserAccount class
+                        UserAccount body = response.body();
+                        String emailDecode = CommonTools.decodeFromBase64String(body.getEmail());
+                        String passDecode = CommonTools.decodeFromBase64String(body.getPassword());
+                        // save to shared preferences class
+                        sharedPref.saveData("UserId",body.getId().toString());
+                        sharedPref.saveData("UserEmail",emailDecode);
+                        sharedPref.saveData("UserPass",passDecode);
+                        Toast.makeText(activity.getApplicationContext(), "Poprawnie zalogowano", Toast.LENGTH_SHORT).show();
+                        Intent MainPageIntent = new Intent(activity.getApplicationContext(), CreateMenuActivity.class);
+                        activity.startActivity(MainPageIntent);
+                        isLogin[0] = true;
+                    } else {
+                        Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + response.message(), Toast.LENGTH_LONG).show();
+                        isLogin[0] = false;
+                    }
                 }
-            }
 
+                @Override
+                public void onFailure(Call<UserAccount> call, Throwable throwable) {
+                    Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                    isLogin[0] = false;
+                }
+            });
         }
 
-        return isLogin;
 
-
-
+        return isLogin[0];
     }
+
 
     public void setToolbar(MaterialToolbar toolbar, String pageName) {
         ToolBarModel toolbarmodel = new ToolBarModel.Builder(activity,
                 toolbar).create().setToolbarSubtitle(pageName).build();
     }
 
-    private void createSampleAccount(){
-        AccountInfoModel user1 = new AccountInfoModel();
-        user1.setEmail("example@com.pl");
-        user1.setPassword("12345");
-        users.add(user1);
-    }
 
 }

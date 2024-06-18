@@ -1,4 +1,4 @@
-package com.example.cookmasteraplication.Models.Adapters;
+package com.example.cookmasteraplication.Adapters;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class GridAdapterProductsFindRecipe extends BaseAdapter {
 
     AppCompatActivity activity;
-    ArrayList<String> products = new ArrayList<>();
+    ArrayList<String> products;
 
     public GridAdapterProductsFindRecipe(AppCompatActivity activity, ArrayList<String> products) {
         this.activity = activity;

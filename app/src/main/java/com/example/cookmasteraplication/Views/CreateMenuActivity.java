@@ -1,13 +1,13 @@
 package com.example.cookmasteraplication.Views;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,14 +17,12 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cookmasteraplication.Controlers.CreateMenuController;
-import com.example.cookmasteraplication.Models.SaveDialogBox;
 import com.example.cookmasteraplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class CreateMenuActivity extends AppCompatActivity {
 
     Button find;
-    Button save;
     EditText nameMenu;
     Spinner spinner_day;
     Spinner spinner_mealCount;
@@ -45,7 +43,6 @@ public class CreateMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_menu);
 
         find = findViewById(R.id.buttonSearchMenu);
-        save = findViewById(R.id.buttonSaveMenu);
         nameMenu = findViewById(R.id.editTextMenuName);
         spinner_day = findViewById(R.id.spinnerMenuCreateDays);
         spinner_mealCount = findViewById(R.id.spinnerMenuMealCount);
@@ -56,7 +53,6 @@ public class CreateMenuActivity extends AppCompatActivity {
         toolbarMenu = findViewById(R.id.toolbarMenuMenuCreate);
         toolbarLogo = findViewById(R.id.toolbarLogoMenuCreate);
         controller = new CreateMenuController(this);
-        Toast.makeText(this,"Poprawnie zalogowano",Toast.LENGTH_SHORT).show();
         // set adapters for spinners
         controller.setSpinnerArrayAdapter(spinner_day, R.array.DaysCount);
         controller.setSpinnerArrayAdapter(spinner_mealCount, R.array.MealCount);
@@ -66,7 +62,6 @@ public class CreateMenuActivity extends AppCompatActivity {
         // create toolbar
         controller.setToolbarLogo(toolbarLogo, pageName);
         controller.setToolbarMenu(toolbarMenu);
-//        controller.setRecyclerView(menuItems);
         Intent intent = new Intent(this, this.getClass());
         spinner_day.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -136,15 +131,18 @@ public class CreateMenuActivity extends AppCompatActivity {
         });
         // on click listeners
         find.setOnClickListener(v -> {
-            controller.findMenus(intent, "daysCount",
-                    "mealCount", "prepareTime",
-                    "rate", "popularity");
-            controller.setRecyclerView(menuItems);
-        });
-        save.setOnClickListener(v -> {
             String menuNameText = nameMenu.getText().toString();
-            controller.saveMenus(menuNameText);
+            intent.putExtra("menuName",menuNameText);
+            boolean isSuccess = controller.findMenus(intent, "daysCount",
+                    "mealCount", "prepareTime",
+                    "rate", "popularity","menuName",
+                    menuItems);
+//            controller.setRecyclerView(menuItems);
+            if(!isSuccess){
+                nameMenu.setBackgroundColor(Color.RED);}
+
         });
+
         controller.setRecyclerView(menuItems);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.createMenulayout), (v, insets) -> {

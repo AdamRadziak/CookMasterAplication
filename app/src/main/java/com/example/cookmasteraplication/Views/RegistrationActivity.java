@@ -13,7 +13,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.cookmasteraplication.Controlers.RegistrationControler;
-import com.example.cookmasteraplication.Models.ToolBarModel;
+import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
 

@@ -3,7 +3,6 @@ package com.example.cookmasteraplication.Views;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -14,8 +13,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.cookmasteraplication.Controlers.LoginPageControler;
-import com.example.cookmasteraplication.Models.SharedPreferencesActivities;
-import com.example.cookmasteraplication.Models.ToolBarModel;
+import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -53,12 +51,18 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this,this.getClass());
         // build a toolbar properties
         controller.setToolbar(toolbar, pageName);
+        // get data from password reminder controller shared preferences class
+        String reminderGetEmail = sharedPref.retrieveData("emailRemind");
+        String reminderGetPass = sharedPref.retrieveData("passRemind");
+        if(!reminderGetPass.isEmpty() && !reminderGetEmail.isEmpty() ){
+            // fill textinput
+            userEmail.setText(reminderGetEmail);
+            userPassword.setText(reminderGetPass);
+        }
         // click listeners
-
         signIn.setOnClickListener(v -> {
             intent.putExtra("email",userEmail.getText().toString());
             intent.putExtra("pass",userPassword.getText().toString());
-            sharedPref.saveData("userEmail",userEmail.getText().toString());
             isLogin = controller.goToMainPage(intent);
             if(!isLogin){
                 userEmail.setBackgroundColor(Color.RED);
