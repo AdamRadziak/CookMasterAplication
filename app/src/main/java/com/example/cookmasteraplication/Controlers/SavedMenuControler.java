@@ -67,6 +67,7 @@ public class SavedMenuControler {
         call.enqueue(new Callback<GetUserMenu>() {
             @Override
             public void onResponse(@NonNull Call<GetUserMenu> call, @NonNull Response<GetUserMenu> response) {
+                menuList.clear();
                 if(response.code()==200){
                     if(response.body() != null){
                     GetUserMenu menu = response.body();

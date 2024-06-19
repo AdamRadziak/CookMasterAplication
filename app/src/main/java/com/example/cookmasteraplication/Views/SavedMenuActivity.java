@@ -46,4 +46,16 @@ public class SavedMenuActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        controller.ListUserMenus(recycler);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        controller.ListUserMenus(recycler);
+    }
 }

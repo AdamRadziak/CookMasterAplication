@@ -63,9 +63,12 @@ public class FindRecipeActivity extends AppCompatActivity {
                 intent.putExtra("productName",productName);
                 controller.addProductToGridView(intent);
                 controller.setGridView(productsSearchItems);
+                productSearch.setText("");
             }
         });
-        searchButton.setOnClickListener(v -> controller.searchRecipesByProducts(recipeList));
+        searchButton.setOnClickListener(v -> {
+            controller.searchRecipesByProducts(recipeList);
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.findRecipeLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

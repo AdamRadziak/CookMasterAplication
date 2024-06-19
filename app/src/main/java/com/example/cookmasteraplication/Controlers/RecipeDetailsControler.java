@@ -1,6 +1,7 @@
 package com.example.cookmasteraplication.Controlers;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,16 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cookmasteraplication.Adapters.RecyclerAdapterProduct;
 import com.example.cookmasteraplication.Adapters.RecyclerAdapterStep;
-import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
-import com.example.cookmasteraplication.Helpers.ToolBarModel;
-import com.example.cookmasteraplication.Helpers.CommonTools;
-import com.example.cookmasteraplication.Views.RecipeDetailsActivity;
 import com.example.cookmasteraplication.Api.Models.Product;
 import com.example.cookmasteraplication.Api.Models.Recipe;
 import com.example.cookmasteraplication.Api.Models.Step;
 import com.example.cookmasteraplication.Api.Models.UpdateRecipe;
 import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
 import com.example.cookmasteraplication.Api.Services.IRecipeService;
+import com.example.cookmasteraplication.Helpers.CommonTools;
+import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
+import com.example.cookmasteraplication.Helpers.ToolBarModel;
+import com.example.cookmasteraplication.Views.RecipeDetailsActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class RecipeDetailsControler {
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setProductList(@NonNull RecyclerView recyclerView) {
         ArrayList<Product> products = new ArrayList<>(GlobalRecipes.get(cardItemPosition).getProducts());
         recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
@@ -93,6 +95,7 @@ public class RecipeDetailsControler {
         adapter.notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setStepList(@NonNull RecyclerView recyclerView) {
         ArrayList<Step> steps = new ArrayList<>(GlobalRecipes.get(cardItemPosition).getSteps());
         recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
@@ -137,7 +140,7 @@ public class RecipeDetailsControler {
         Call<Recipe> call = client.AddRecipe2Favourites(IdRecipe, IdUser);
         call.enqueue(new Callback<Recipe>() {
             @Override
-            public void onResponse(Call<Recipe> call, Response<Recipe> response) {
+            public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
                 if (response.code() == 200) {
                     Toast.makeText(activity.getApplicationContext(), "Dodałeś przepis  "
                             + recipeName + " do ulubionych", Toast.LENGTH_LONG).show();
@@ -149,7 +152,7 @@ public class RecipeDetailsControler {
             }
 
             @Override
-            public void onFailure(Call<Recipe> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),
                         "Błąd " + throwable.getMessage(), Toast.LENGTH_LONG).show();
 
@@ -158,7 +161,6 @@ public class RecipeDetailsControler {
     }
 
     public void rateRecipe(float Userrate) {
-        final boolean[] fromUser = {false};
         // this function sends api rate by user
         UpdateRecipe updateRecipe = new UpdateRecipe(recipeName, recipeCategory, prepareTime,
                 mealCount, (double) Userrate, popularity, recipeDesc);
@@ -167,30 +169,32 @@ public class RecipeDetailsControler {
         Call<Recipe> call = client.UpdateRecipe(updateRecipe, IdRecipe);
         call.enqueue(new Callback<Recipe>() {
             @Override
-            public void onResponse(Call<Recipe> call, Response<Recipe> response) {
+            public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
                 if (response.code() == 200) {
+                    if(response.body() != null){
                     rate = response.body().getRate();
                     Toast.makeText(activity.getApplicationContext(), "Oceniłeś przepis na  " + Userrate +
-                            " gwiazdek", Toast.LENGTH_LONG).show();
-                    fromUser[0] =true;
+                            " gwiazdek", Toast.LENGTH_LONG).show();}
+                    else {
+                        Toast.makeText(activity.getApplicationContext(),
+                                "Nie można pobrać zawartości ", Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     Toast.makeText(activity.getApplicationContext(),
                             "Błąd " + response.message(), Toast.LENGTH_LONG).show();
-                    fromUser[0] =true;
                 }
             }
 
             @Override
-            public void onFailure(Call<Recipe> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),
                         "Błąd " + throwable.getMessage(), Toast.LENGTH_LONG).show();
-                fromUser[0] =true;
             }
         });
     }
 
     public void setMealImage(ImageView image) {
-        image.setImageDrawable(CommonTools.createImagefromBytes(imageByte,activity));
+        image.setImageDrawable(CommonTools.createImagefromBytes(imageByte, activity));
     }
 
 
