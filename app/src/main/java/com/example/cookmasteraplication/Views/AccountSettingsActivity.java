@@ -3,10 +3,10 @@ package com.example.cookmasteraplication.Views;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +27,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
     Button changepassw;
     Button deleteAccount;
     LinearLayout layout;
+    ProgressBar progressBar;
     AccountSettingsControler controler;
     SharedPreferencesActivities sharedPref;
     String pageName = "Ustawienia użytkownika";
@@ -43,8 +44,9 @@ public class AccountSettingsActivity extends AppCompatActivity {
         deleteAccount = findViewById(R.id.buttonDelteAccount);
         password = findViewById(R.id.editTextPassAccountSet);
         layout = findViewById(R.id.AccountSettLinLay);
+        progressBar = findViewById(R.id.progressBarAccountSetting);
 
-        controler = new AccountSettingsControler(this);
+        controler = new AccountSettingsControler(this,progressBar);
         sharedPref = new SharedPreferencesActivities(this);
 //        Intent intentUserEmail = getIntent();
         Intent intentPassChange = new Intent(this,this.getClass());
@@ -63,12 +65,9 @@ public class AccountSettingsActivity extends AppCompatActivity {
             }
         });
 
-        deleteAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String userEmail = sharedPref.retrieveStringData("userEmail");
-                controler.showDeleteAccountDialogMsg(userEmail);
-            }
+        deleteAccount.setOnClickListener(v -> {
+            String userEmail = sharedPref.retrieveStringData("userEmail");
+            controler.showDeleteAccountDialogMsg();
         });
 
 

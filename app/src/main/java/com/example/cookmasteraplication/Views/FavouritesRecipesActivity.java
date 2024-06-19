@@ -1,6 +1,7 @@
 package com.example.cookmasteraplication.Views;
 
 import android.os.Bundle;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,7 @@ public class FavouritesRecipesActivity extends AppCompatActivity {
     MaterialToolbar toolbarLogo;
     MaterialToolbar toolbarMenu;
     RecyclerView favouriteMenuitem;
+    ProgressBar progressBar;
     FavouritesRecipesControler controller;
     String pageName = "ulubione przepisy";
 
@@ -30,7 +32,8 @@ public class FavouritesRecipesActivity extends AppCompatActivity {
         toolbarLogo = findViewById(R.id.toolbarLogoFavourites);
         toolbarMenu = findViewById(R.id.toolbarMenuFavourites);
         favouriteMenuitem = findViewById(R.id.recyclerFavourites);
-        controller = new FavouritesRecipesControler(this);
+        progressBar = findViewById(R.id.progressBarFavourite);
+        controller = new FavouritesRecipesControler(this,progressBar);
 
         controller.setToolbarLogo(toolbarLogo, pageName);
         controller.setToolbarMenu(toolbarMenu);

@@ -1,6 +1,7 @@
 package com.example.cookmasteraplication.Views;
 
 import android.os.Bundle;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,7 @@ public class SavedMenuActivity extends AppCompatActivity {
     MaterialToolbar toolbarLogo;
     MaterialToolbar toolbarMenu;
     RecyclerView recycler;
+    ProgressBar progressBar;
     SavedMenuControler controller;
     String pageName = "Zapisane menu";
 
@@ -30,7 +32,8 @@ public class SavedMenuActivity extends AppCompatActivity {
         toolbarLogo = findViewById(R.id.toolbarLogoSavedMenu);
         toolbarMenu = findViewById(R.id.toolbarMenuSavedMenu);
         recycler = findViewById(R.id.recyclerSavedMenu);
-        controller = new SavedMenuControler(this);
+        progressBar = findViewById(R.id.progressBarSavedMenu);
+        controller = new SavedMenuControler(this,progressBar);
 
         controller.setToolbarLogo(toolbarLogo, pageName);
         controller.setToolbarMenu(toolbarMenu);

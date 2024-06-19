@@ -172,11 +172,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginLeft="10dp"
                     android:gravity="center_vertical"
                     android:text="Wyszukaj i zapisz"
                     android:textColor="@color/black"
                     android:theme="@style/PrimaryButton" />
+
+                <ProgressBar
+                    android:id="@+id/progressBarCreateMenu"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp" />
 
             </LinearLayout>
 

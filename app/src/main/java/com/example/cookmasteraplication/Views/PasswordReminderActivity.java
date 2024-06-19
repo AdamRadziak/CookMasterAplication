@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +13,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.cookmasteraplication.Controlers.PasswordReminderControler;
-import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -21,12 +21,10 @@ public class PasswordReminderActivity extends AppCompatActivity {
     Button back;
     Button reminder;
     EditText userEmail;
+    ProgressBar progressBar;
     PasswordReminderControler controller;
     LinearLayout layout;
-    ToolBarModel toolbarmodel;
-
     MaterialToolbar toolbar;
-
     String pageName = "Przypomnienie hasła";
 
     @Override
@@ -37,11 +35,12 @@ public class PasswordReminderActivity extends AppCompatActivity {
 
         back = findViewById(R.id.buttonBack);
         reminder = findViewById(R.id.buttonPassRem);
+        progressBar = findViewById(R.id.progressBarPassRemind);
 
         userEmail = findViewById(R.id.editTextEmailReminder);
         layout = findViewById(R.id.passRemLayout);
         toolbar = findViewById(R.id.toolbarPassRem);
-        controller = new PasswordReminderControler(this);
+        controller = new PasswordReminderControler(this,progressBar);
         // toolbar build
         controller.setToolbar(toolbar, pageName);
         // click on listeners

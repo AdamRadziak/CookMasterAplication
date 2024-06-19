@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +14,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.cookmasteraplication.Controlers.RegistrationControler;
-import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -24,12 +24,9 @@ public class RegistrationActivity extends AppCompatActivity {
     EditText email;
     EditText password;
     LinearLayout layout;
+    ProgressBar progressBar;
     RegistrationControler controler;
-
-    ToolBarModel toolbarmodel;
-
     MaterialToolbar toolbar;
-
     String pageName = "Rejestracja";
 
 
@@ -45,17 +42,19 @@ public class RegistrationActivity extends AppCompatActivity {
         password = findViewById(R.id.editTextPasswordReg);
         layout = findViewById(R.id.registerLayout);
         toolbar = findViewById(R.id.toolbarRegister);
-        controler = new RegistrationControler(this);
-        Intent intent = new Intent(this,this.getClass());
+        progressBar = findViewById(R.id.progressBarRegister);
+        controler = new RegistrationControler(this,progressBar);
+        Intent intent = new Intent(this, this.getClass());
         // toolbar build
         controler.setToolbar(toolbar, pageName);
         // clikc on listeners
         back.setOnClickListener(v -> controler.goBackLoginPage());
 
-        register.setOnClickListener(v ->{
-            intent.putExtra("email",email.getText().toString());
-            intent.putExtra("pass",password.getText().toString());
-            controler.sendRegisterUserData(intent, layout);});
+        register.setOnClickListener(v -> {
+            intent.putExtra("email", email.getText().toString());
+            intent.putExtra("pass", password.getText().toString());
+            controler.sendRegisterUserData(intent, layout);
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.registerLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

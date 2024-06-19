@@ -5,20 +5,19 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.cookmasteraplication.Models.AccountInfoModel;
+import androidx.annotation.NonNull;
+
+import com.example.cookmasteraplication.Api.Models.UserAccount;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserAccountService;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
-import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Views.CreateMenuActivity;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.PasswordReminderActivity;
 import com.example.cookmasteraplication.Views.RegistrationActivity;
-import com.example.cookmasteraplication.Api.Models.UserAccount;
-import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.Api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
-
-import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,14 +26,18 @@ import retrofit2.Retrofit;
 
 public class LoginPageControler {
 
-    public static ArrayList<AccountInfoModel> users = new ArrayList<>();
     private final LoginActivity activity;
     private final SharedPreferencesActivities sharedPref;
+    private final ProgressBar progressBar;
 
 
-    public LoginPageControler(LoginActivity activity) {
+    public LoginPageControler(LoginActivity activity,ProgressBar progressBar) {
         this.activity = activity;
         this.sharedPref = new SharedPreferencesActivities(this.activity);
+        this.progressBar = progressBar;
+        // set default progressbar values
+        this.progressBar.setVisibility(View.INVISIBLE);
+        this.progressBar.setIndeterminate(false);
     }
 
     public void goToRegisterPage() {
@@ -47,9 +50,8 @@ public class LoginPageControler {
         activity.startActivity(intent);
     }
 
-    public boolean goToMainPage(Intent intent, ProgressBar progressBar) {
+    public boolean goToMainPage(Intent intent) {
         final boolean[] isLogin = {true};
-        int statusCode;
         progressBar.setVisibility(View.VISIBLE);
         progressBar.setIndeterminate(true);
         // verify that email and password is correct
@@ -65,9 +67,10 @@ public class LoginPageControler {
             Call<UserAccount> call = client.LogIn(emailEncode, passEncode);
             call.enqueue(new Callback<UserAccount>() {
                 @Override
-                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
+                public void onResponse(@NonNull Call<UserAccount> call, @NonNull Response<UserAccount> response) {
                     if (response.code() == 200) {
                         // add to GetUserAccount class
+                        if(response.body() != null){
                         UserAccount body = response.body();
                         String emailDecode = CommonTools.decodeFromBase64String(body.getEmail());
                         String passDecode = CommonTools.decodeFromBase64String(body.getPassword());
@@ -80,20 +83,23 @@ public class LoginPageControler {
                         Toast.makeText(activity.getApplicationContext(), "Poprawnie zalogowano", Toast.LENGTH_SHORT).show();
                         Intent MainPageIntent = new Intent(activity.getApplicationContext(), CreateMenuActivity.class);
                         activity.startActivity(MainPageIntent);
-                        isLogin[0] = true;
+                        isLogin[0] = true;}
+                        else{
+                            Toast.makeText(activity.getApplicationContext(), "Nie można pobrać zawartości ",Toast.LENGTH_LONG).show();
+                        }
                     } else {
-                        Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + response.message(), Toast.LENGTH_LONG).show();
                         progressBar.setIndeterminate(false);
                         progressBar.setVisibility(View.INVISIBLE);
+                        Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + response.message(), Toast.LENGTH_LONG).show();
                         isLogin[0] = false;
                     }
                 }
 
                 @Override
-                public void onFailure(Call<UserAccount> call, Throwable throwable) {
-                    Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                public void onFailure(@NonNull Call<UserAccount> call, @NonNull Throwable throwable) {
                     progressBar.setIndeterminate(false);
                     progressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + throwable.getMessage(), Toast.LENGTH_LONG).show();
                     isLogin[0] = false;
                 }
             });

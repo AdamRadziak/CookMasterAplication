@@ -2,10 +2,10 @@ package com.example.cookmasteraplication.Views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -25,6 +25,7 @@ public class FindRecipeActivity extends AppCompatActivity {
     MaterialToolbar toolbarMenu;
     RecyclerView recipeList;
     AutoCompleteTextView productSearch;
+    ProgressBar progressBar;
     ImageButton addButton;
     ImageButton searchButton;
     GridView productsSearchItems;
@@ -43,10 +44,11 @@ public class FindRecipeActivity extends AppCompatActivity {
         productSearch = findViewById(R.id.textViewAddProd);
         addButton = findViewById(R.id.buttonAddProd);
         searchButton = findViewById(R.id.buttonSearchRecipe);
-
+        progressBar = findViewById(R.id.progressBarFindRecipe);
         recipeList = findViewById(R.id.recyclerFindRecipe);
         productsSearchItems = findViewById(R.id.gridViewProducts);
-        controller = new FindRecipeControler(this);
+
+        controller = new FindRecipeControler(this,progressBar);
         Intent intent = new Intent(this, this.getClass());
 
         controller.setToolbarLogo(toolbarLogo,pageName);
@@ -63,12 +65,7 @@ public class FindRecipeActivity extends AppCompatActivity {
                 controller.setGridView(productsSearchItems);
             }
         });
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.searchRecipesByProducts(recipeList);
-            }
-        });
+        searchButton.setOnClickListener(v -> controller.searchRecipesByProducts(recipeList));
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.findRecipeLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

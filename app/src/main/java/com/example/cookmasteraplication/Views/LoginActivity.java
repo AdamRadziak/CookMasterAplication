@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbarLogin);
         progressBar = findViewById(R.id.progressBarLogin);
         // instance of the class login controller
-        controller = new LoginPageControler(this);
+        controller = new LoginPageControler(this,progressBar);
         sharedPref = new SharedPreferencesActivities(this);
         Intent intent = new Intent(this,this.getClass());
         // build a toolbar properties
@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         signIn.setOnClickListener(v -> {
             intent.putExtra("email",userEmail.getText().toString());
             intent.putExtra("pass",userPassword.getText().toString());
-            isLogin = controller.goToMainPage(intent,progressBar);
+            isLogin = controller.goToMainPage(intent);
             if(!isLogin){
                 userEmail.setBackgroundColor(Color.RED);
                 userPassword.setBackgroundColor(Color.RED);

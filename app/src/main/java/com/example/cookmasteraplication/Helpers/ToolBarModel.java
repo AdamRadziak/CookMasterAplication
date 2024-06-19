@@ -25,13 +25,10 @@ import retrofit2.Retrofit;
 
 final public class ToolBarModel {
 
-    private final AppCompatActivity activity;
-    private final MaterialToolbar toolbar;
-
 
     public ToolBarModel(Builder builder) {
-        this.activity = builder.activity;
-        this.toolbar = builder.toolbar;
+        AppCompatActivity activity = builder.activity;
+        MaterialToolbar toolbar = builder.toolbar;
     }
 
     public static class Builder {
@@ -66,33 +63,33 @@ final public class ToolBarModel {
         public Builder setMenuOItemOnClickListeners() {
             toolbar.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == R.id.createMenuItem) {
-                    Toast.makeText(activity.getApplicationContext(), "create menu item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), "Utwórz menu", Toast.LENGTH_SHORT).show();
                     Intent createMenuIntent = new Intent(activity.getApplicationContext(), CreateMenuActivity.class);
                     activity.startActivity(createMenuIntent);
                 } else if (item.getItemId() == R.id.findRecipeMenuItem) {
-                    Toast.makeText(activity.getApplicationContext(), "find recipe menu item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), "Znajdź przepis", Toast.LENGTH_SHORT).show();
                     Intent findRecipeIntent = new Intent(activity.getApplicationContext(), FindRecipeActivity.class);
                     activity.startActivity(findRecipeIntent);
 
                 } else if (item.getItemId() == R.id.savedMenusMenuItem) {
-                    Toast.makeText(activity.getApplicationContext(), "saved menu item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), "Menu użytkownika", Toast.LENGTH_SHORT).show();
                     Intent savedMenuIntent = new Intent(activity.getApplicationContext(), SavedMenuActivity.class);
                     activity.startActivity(savedMenuIntent);
                 } else if (item.getItemId() == R.id.favouritesMenuItem) {
-                    Toast.makeText(activity.getApplicationContext(), "favourites menu item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), "Ulubione przepisy", Toast.LENGTH_SHORT).show();
                     Intent favouritesIntent = new Intent(activity.getApplicationContext(), FavouritesRecipesActivity.class);
                     activity.startActivity(favouritesIntent);
                 } else if (item.getItemId() == R.id.accountSettingsMenuItem) {
-                    Toast.makeText(activity.getApplicationContext(), "account settings menu item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), "Ustawienia konta", Toast.LENGTH_SHORT).show();
                     Intent accountSettIntent = new Intent(activity.getApplicationContext(), AccountSettingsActivity.class);
                     activity.startActivity(accountSettIntent);
 
                 } else if (item.getItemId() == R.id.signOutMenuItem) {
-                    Toast.makeText(activity.getApplicationContext(), "logout menu item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), "Wyloguj", Toast.LENGTH_SHORT).show();
                     logout();
 
                 } else if (item.getItemId() == R.id.backMenuItem) {
-                    Toast.makeText(activity.getApplicationContext(), "Back menu item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), "Wstecz", Toast.LENGTH_SHORT).show();
                     activity.finish();
 
                 }

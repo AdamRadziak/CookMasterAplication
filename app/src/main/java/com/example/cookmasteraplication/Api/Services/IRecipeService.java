@@ -14,8 +14,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface IRecipeService {
-    @GET("Recipes/{id}")
-    Call<Recipe> GetRecipe(@Path("id") Integer id);
     @GET("Recipes/list")
     Call<RecipeList> GetRecipeList(@Query("Filters") String filter,
                                      @Query("Sorts") String sort);
@@ -23,9 +21,9 @@ public interface IRecipeService {
     Call<Recipe> UpdateRecipe(@Body UpdateRecipe updateRecipe, @Path("id") Integer id);
     @POST("Recipes/AddFavourite/{IdRecipe}/ForUser/{idUser}")
     Call<Recipe> AddRecipe2Favourites(@Path("IdRecipe") Integer IdRecipe, @Path("idUser") Integer id);
-    @GET("Recipes/list/GetFavourities/ForUser/{Email}")
-    Call<RecipeList> ListFavoritesRecipeByUser(@Path("Email") String Email);
-    @DELETE("Recipes/DeleteFavourite/{id}/ForUser/{Email}")
-    Call<Recipe> DeleteRecipeFromFavourites(@Path("id") Integer id,@Path("Email") String Email);
+    @GET("Recipes/list/GetFavourities/ForUser/{idUser}")
+    Call<RecipeList> ListFavoritesRecipeByUser(@Path("idUser") Integer idUser);
+    @DELETE("Recipes/DeleteFavourite/{id}/ForUser/{idUser}")
+    Call<Recipe> DeleteRecipeFromFavourites(@Path("id") Integer id,@Path("idUser") Integer idUser);
 
 }

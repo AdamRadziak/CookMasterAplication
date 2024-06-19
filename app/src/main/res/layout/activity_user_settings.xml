@@ -4,8 +4,8 @@
     android:id="@+id/userSettLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Views.AccountSettingsActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".Views.AccountSettingsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -30,7 +30,7 @@
     <LinearLayout
         android:id="@+id/AccountSettLinLay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
@@ -63,6 +63,19 @@
             android:text="Usuń konto"
             android:textColor="@color/black"
             android:theme="@style/PrimaryButton" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/progressBarAccountSetting"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:visibility="invisible" />
     </LinearLayout>
 
 

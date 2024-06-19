@@ -1,6 +1,6 @@
 package com.example.cookmasteraplication.Adapters;
 
-import android.content.DialogInterface;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -77,6 +77,7 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
         return CommonTools.createImagefromBytes(imagebyte,activity);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
         PageDatumUserMenu customMenuItem = menuList.get(position);
@@ -137,6 +138,7 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
         holder.deleteButton.setOnClickListener(v -> {
             showDialogMsg(holder.getAdapterPosition());
             // refresh recycler view
+            notifyDataSetChanged();
         });
         // set backgorund for card
         if (position % 2 == 0) {
@@ -154,7 +156,7 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
         Call<PageDatumUserMenu> call = client.UpdateMenu(updateUserMenu,menuList.get(position).getId());
         call.enqueue(new Callback<PageDatumUserMenu>() {
             @Override
-            public void onResponse(Call<PageDatumUserMenu> call, Response<PageDatumUserMenu> response) {
+            public void onResponse(@NonNull Call<PageDatumUserMenu> call, @NonNull Response<PageDatumUserMenu> response) {
                 if(response.code() == 200){
                     menuList.set(position,response.body());
                     Toast.makeText(activity.getApplicationContext(),"Pomyślnie zmieniono nazwę menu na "
@@ -169,7 +171,7 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
             }
 
             @Override
-            public void onFailure(Call<PageDatumUserMenu> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<PageDatumUserMenu> call, @NonNull Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),"Błąd " + throwable.getMessage(),
                         Toast.LENGTH_LONG).show();
 
@@ -184,10 +186,12 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
         IUserMenuService client = retrofitClient.create(IUserMenuService.class);
         Call<PageDatumUserMenu> call = client.DeleteMenu(menuList.get(position).getId());
         call.enqueue(new Callback<PageDatumUserMenu>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onResponse(Call<PageDatumUserMenu> call, Response<PageDatumUserMenu> response) {
+            public void onResponse(@NonNull Call<PageDatumUserMenu> call, @NonNull Response<PageDatumUserMenu> response) {
                 if (response.code()==204){
                 menuList.remove(position);
+                notifyDataSetChanged();
                 }else{
                     Toast.makeText(activity.getApplicationContext(),
                             "Błąd " + response.message(),Toast.LENGTH_LONG).show();
@@ -195,7 +199,7 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
             }
 
             @Override
-            public void onFailure(Call<PageDatumUserMenu> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<PageDatumUserMenu> call, @NonNull Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),
                         "Błąd " + throwable.getMessage(),Toast.LENGTH_LONG).show();
             }
@@ -205,20 +209,13 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
     private void showDialogMsg(int position) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity, R.style.DialogTheme);
         alertDialog.setTitle("Usuwanie menu").setMessage("Czy chcesz usunąć całe zapisane menu?")
-                .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // close dialoge message
-                        dialog.dismiss();
-                    }
-                }).setPositiveButton("Tak", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // delete text in result textview
-                        deleteMenuName(position);
-                        notifyDataSetChanged();
-                        dialog.dismiss();
-                    }
+                .setNegativeButton("Nie", (dialog, which) -> {
+                    // close dialoge message
+                    dialog.dismiss();
+                }).setPositiveButton("Tak", (dialog, which) -> {
+                    // delete text in result textview
+                    deleteMenuName(position);
+                    dialog.dismiss();
                 }).show();
         alertDialog.create();
     }

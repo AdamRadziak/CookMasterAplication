@@ -1,6 +1,5 @@
 package com.example.cookmasteraplication.Adapters;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -41,7 +40,7 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
     private final List<Recipe> recipelist;
 
     public RecyclerAdapterFavouriteRecipe(AppCompatActivity activity,
-    SharedPreferencesActivities sharedPref,List<Recipe> recipelist) {
+                                          SharedPreferencesActivities sharedPref, List<Recipe> recipelist) {
         this.activity = activity;
         this.sharedPref = sharedPref;
         this.recipelist = recipelist;
@@ -66,13 +65,13 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
         Recipe customMenuItem = recipelist.get(position);
         // string for labels
         String prepareTimeString = "Czas " + String.format(Locale.ENGLISH,
-                "%d",customMenuItem.getPrepareTime()) + " min";
+                "%d", customMenuItem.getPrepareTime()) + " min";
         String mealCountString = "Ilość porcji " + String.format(Locale.ENGLISH,
-                "%d",customMenuItem.getMealCount()) ;
+                "%d", customMenuItem.getMealCount());
         String rateString = "Ocena " + String.format(Locale.ENGLISH,
-                "%.1f",customMenuItem.getRate()) + "/5" ;
+                "%.1f", customMenuItem.getRate()) + "/5";
         String popularityString = "Popularność " + String.format(Locale.ENGLISH,
-                "%.1f",customMenuItem.getPopularity()) + "/5" ;
+                "%.1f", customMenuItem.getPopularity()) + "/5";
         holder.FavouriteRecipeName.setText(customMenuItem.getName());
         holder.FavouriteRecipePrepareTime.setText(prepareTimeString);
         holder.FavouriteRecipeMealCount.setText(mealCountString);
@@ -82,11 +81,12 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
         String imagebyte = customMenuItem.getPhotos().get(0)
                 .getData();
         // set drawable by first photo for recipe
-        Drawable image = CommonTools.createImagefromBytes(imagebyte,activity);
+        Drawable image = CommonTools.createImagefromBytes(imagebyte, activity);
         holder.imageViewFavouriteRecipe.setImageDrawable(image);
         holder.cardViewFavouriteRecipe.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), RecipeDetailsActivity.class);
             intent.putExtra("cardPosition", position);
+            intent.putExtra("recipeImage",imagebyte);
             activity.startActivity(intent);
         });
         holder.delete.setOnClickListener(v -> {
@@ -104,52 +104,45 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
     private void showDialogMsg(int position) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity, R.style.DialogTheme);
         alertDialog.setTitle("Usuwanie menu").setMessage("Czy chcesz usunąć całe zapisane menu?")
-                .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // close dialoge message
-                        dialog.dismiss();
-                    }
-                }).setPositiveButton("Tak", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // delete from database by api
-                        removeFromFavourities(position);
-                        notifyDataSetChanged();
-                        dialog.dismiss();
-                    }
+                .setNegativeButton("Nie", (dialog, which) -> {
+                    // close dialoge message
+                    dialog.dismiss();
+                }).setPositiveButton("Tak", (dialog, which) -> {
+                    // delete from database by api
+                    removeFromFavourities(position);
+                    notifyDataSetChanged();
+                    dialog.dismiss();
                 }).show();
         alertDialog.create();
     }
 
-    private void removeFromFavourities(int position){
+    private void removeFromFavourities(int position) {
         // get from shared preferences IdMenu
         Retrofit retrofitClient = BaseClient.get_AuthClient(sharedPref.getUserEmail(),
                 sharedPref.getUserPass());
         IRecipeService client = retrofitClient.create(IRecipeService.class);
-        Call<Recipe> call = client.DeleteRecipeFromFavourites(recipelist.get(position).getId(),sharedPref.getUserEmail());
+        Call<Recipe> call = client.DeleteRecipeFromFavourites(recipelist.get(position).getId(), sharedPref.getUserId());
         call.enqueue(new Callback<Recipe>() {
             @Override
-            public void onResponse(Call<Recipe> call, Response<Recipe> response) {
-                if(response.code()==204){
+            public void onResponse(@NonNull Call<Recipe> call, @NonNull Response<Recipe> response) {
+                if (response.code() == 204) {
                     Toast.makeText(activity.getApplicationContext(),
-                            "Pomyślnie usunięto przepis z ulubionych",Toast.LENGTH_LONG)
+                                    "Pomyślnie usunięto przepis z ulubionych", Toast.LENGTH_LONG)
                             .show();
                     recipelist.remove(position);
                     notifyDataSetChanged();
-                }
-                else{
+                } else {
                     Toast.makeText(activity.getApplicationContext(),
-                                    "Błąd " + response.message(),Toast.LENGTH_LONG)
+                                    "Błąd " + response.message(), Toast.LENGTH_LONG)
                             .show();
 
                 }
             }
 
             @Override
-            public void onFailure(Call<Recipe> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<Recipe> call, @NonNull Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),
-                                "Błąd " + throwable.getMessage(),Toast.LENGTH_LONG)
+                                "Błąd " + throwable.getMessage(), Toast.LENGTH_LONG)
                         .show();
             }
         });

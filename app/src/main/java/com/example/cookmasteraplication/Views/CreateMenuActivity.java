@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import androidx.activity.EdgeToEdge;
@@ -30,6 +31,7 @@ public class CreateMenuActivity extends AppCompatActivity {
     Spinner spinner_rate;
     Spinner spinner_popularity;
     RecyclerView menuItems;
+    ProgressBar progressBar;
     MaterialToolbar toolbarLogo;
     MaterialToolbar toolbarMenu;
     CreateMenuController controller;
@@ -52,7 +54,8 @@ public class CreateMenuActivity extends AppCompatActivity {
         menuItems = findViewById(R.id.recyclerMenuCreation);
         toolbarMenu = findViewById(R.id.toolbarMenuMenuCreate);
         toolbarLogo = findViewById(R.id.toolbarLogoMenuCreate);
-        controller = new CreateMenuController(this);
+        progressBar = findViewById(R.id.progressBarCreateMenu);
+        controller = new CreateMenuController(this,progressBar);
         // set adapters for spinners
         controller.setSpinnerArrayAdapter(spinner_day, R.array.DaysCount);
         controller.setSpinnerArrayAdapter(spinner_mealCount, R.array.MealCount);
@@ -152,15 +155,15 @@ public class CreateMenuActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        controller.setRecyclerView(menuItems);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        controller.setRecyclerView(menuItems);
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        controller.setRecyclerView(menuItems);
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        controller.setRecyclerView(menuItems);
+//    }
 }

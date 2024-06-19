@@ -1,7 +1,10 @@
 package com.example.cookmasteraplication.Controlers;
 
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,11 +29,16 @@ public class SavedMenuControler {
 
     public static ArrayList<PageDatumUserMenu> menuList = new ArrayList<>();
     private final SavedMenuActivity activity;
-    SharedPreferencesActivities sharedPref;
+    private final SharedPreferencesActivities sharedPref;
+    private final ProgressBar progressBar;
 
-    public SavedMenuControler(SavedMenuActivity activity) {
+    public SavedMenuControler(SavedMenuActivity activity,ProgressBar progressBar) {
         this.activity = activity;
         this.sharedPref = new SharedPreferencesActivities(this.activity);
+        this.progressBar = progressBar;
+        // set default progressbar values
+        this.progressBar.setVisibility(View.INVISIBLE);
+        this.progressBar.setIndeterminate(false);
     }
 
     public void setToolbarLogo(MaterialToolbar toolbar, String pageName) {
@@ -46,6 +54,8 @@ public class SavedMenuControler {
 
     public void ListUserMenus(RecyclerView recyclerView)
     {
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
         String email = sharedPref.getUserEmail();
         String password = sharedPref.getUserPass();
         Integer IdUser = sharedPref.getUserId();
@@ -56,23 +66,35 @@ public class SavedMenuControler {
 
         call.enqueue(new Callback<GetUserMenu>() {
             @Override
-            public void onResponse(Call<GetUserMenu> call, Response<GetUserMenu> response) {
+            public void onResponse(@NonNull Call<GetUserMenu> call, @NonNull Response<GetUserMenu> response) {
                 if(response.code()==200){
+                    if(response.body() != null){
                     GetUserMenu menu = response.body();
                     menuList.addAll(menu.getPageData());
                     recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
                     RecyclerAdapterSavedMenu adapter = new RecyclerAdapterSavedMenu(menuList, activity, sharedPref);
-                    recyclerView.setAdapter(adapter);
+                    recyclerView.setAdapter(adapter);}
+                    else{
+                        Toast.makeText(activity.getApplicationContext(),
+                                "Nie udało się pobrać zawartości z serwera "
+                                ,Toast.LENGTH_LONG).show();
+                    }
+                    progressBar.setVisibility(View.INVISIBLE);
+                    progressBar.setIndeterminate(false);
 
                 }
                 else{
+                    progressBar.setVisibility(View.INVISIBLE);
+                    progressBar.setIndeterminate(false);
                     Toast.makeText(activity.getApplicationContext(),
                             "Błąd " + response.message(),Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<GetUserMenu> call, Throwable throwable) {
+            public void onFailure(@NonNull Call<GetUserMenu> call, @NonNull Throwable throwable) {
+                progressBar.setVisibility(View.INVISIBLE);
+                progressBar.setIndeterminate(false);
                 Toast.makeText(activity.getApplicationContext(),
                         "Błąd " + throwable.getMessage(),Toast.LENGTH_LONG).show();
                 call.cancel();
