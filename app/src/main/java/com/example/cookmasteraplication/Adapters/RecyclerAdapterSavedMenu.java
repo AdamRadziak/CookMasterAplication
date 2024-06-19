@@ -2,8 +2,8 @@ package com.example.cookmasteraplication.Adapters;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,17 +20,16 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cookmasteraplication.Api.Models.PageDatumUserMenu;
+import com.example.cookmasteraplication.Api.Models.Recipe;
+import com.example.cookmasteraplication.Api.Models.UpdateUserMenu;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserMenuService;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.R;
-import com.example.cookmasteraplication.Utils.CommonTools;
 import com.example.cookmasteraplication.Views.SavedMenuDetailsActivity;
-import com.example.cookmasteraplication.api.Models.PageDatumUserMenu;
-import com.example.cookmasteraplication.api.Models.Recipe;
-import com.example.cookmasteraplication.api.Models.UpdateUserMenu;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IUserMenuService;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,10 +71,10 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
         return menuList.size();
     }
 
-    private Bitmap convert_from_bytes_2_image(PageDatumUserMenu customMenuItem, int index){
-        byte[] imagebyte = customMenuItem.getRecipes().get(index)
-                .getPhotos().get(0).getData().getBytes(Charset.defaultCharset());
-        return CommonTools.createImagefromBytes(imagebyte);
+    private Drawable convert_from_bytes_2_image(PageDatumUserMenu customMenuItem, int index){
+        String imagebyte = customMenuItem.getRecipes().get(index)
+                .getPhotos().get(0).getData();
+        return CommonTools.createImagefromBytes(imagebyte,activity);
     }
 
     @Override
@@ -85,28 +84,28 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
         // menu titles
         List<Recipe> recipes = customMenuItem.getRecipes();
         if(recipes.size() == 1){
-        holder.menu1Title.setText(customMenuItem.getRecipes().get(position).getCategory());
+        holder.menu1Title.setText(customMenuItem.getRecipes().get(0).getCategory());
         holder.menu2Title.setText("");
         holder.menu3Title.setText("");
-        holder.imageMenu1.setImageBitmap(convert_from_bytes_2_image(customMenuItem,position));
-        holder.imageMenu2.setImageBitmap(null);
-        holder.imageMenu3.setImageBitmap(null);}
+        holder.imageMenu1.setImageDrawable(convert_from_bytes_2_image(customMenuItem,0));
+        holder.imageMenu2.setImageDrawable(null);
+        holder.imageMenu3.setImageDrawable(null);}
         else if (recipes.size() == 2)
         {
-            holder.menu1Title.setText(customMenuItem.getRecipes().get(position).getCategory());
-            holder.menu2Title.setText(customMenuItem.getRecipes().get(position+1).getCategory());
+            holder.menu1Title.setText(customMenuItem.getRecipes().get(0).getCategory());
+            holder.menu2Title.setText(customMenuItem.getRecipes().get(1).getCategory());
             holder.menu3Title.setText("");
-            holder.imageMenu1.setImageBitmap(convert_from_bytes_2_image(customMenuItem,position));
-            holder.imageMenu2.setImageBitmap(convert_from_bytes_2_image(customMenuItem,position+1));
-            holder.imageMenu3.setImageBitmap(null);
+            holder.imageMenu1.setImageDrawable(convert_from_bytes_2_image(customMenuItem,0));
+            holder.imageMenu2.setImageDrawable(convert_from_bytes_2_image(customMenuItem,1));
+            holder.imageMenu3.setImageDrawable(null);
         }
         else if (recipes.size() == 3){
-            holder.menu1Title.setText(customMenuItem.getRecipes().get(position).getCategory());
-            holder.menu2Title.setText(customMenuItem.getRecipes().get(position+1).getCategory());
-            holder.menu3Title.setText(customMenuItem.getRecipes().get(position+2).getCategory());
-            holder.imageMenu1.setImageBitmap(convert_from_bytes_2_image(customMenuItem,position));
-            holder.imageMenu2.setImageBitmap(convert_from_bytes_2_image(customMenuItem,position+1));
-            holder.imageMenu3.setImageBitmap(convert_from_bytes_2_image(customMenuItem,position+2));
+            holder.menu1Title.setText(customMenuItem.getRecipes().get(0).getCategory());
+            holder.menu2Title.setText(customMenuItem.getRecipes().get(1).getCategory());
+            holder.menu3Title.setText(customMenuItem.getRecipes().get(2).getCategory());
+            holder.imageMenu1.setImageDrawable(convert_from_bytes_2_image(customMenuItem,0));
+            holder.imageMenu2.setImageDrawable(convert_from_bytes_2_image(customMenuItem,1));
+            holder.imageMenu3.setImageDrawable(convert_from_bytes_2_image(customMenuItem,2));
         }
 
         //images
@@ -125,7 +124,7 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
                     idRecipes.add(recipe.getId());
                 }
                 // set menu name by api
-                UpdateUserMenu updateUserMenu = new UpdateUserMenu(customMenuItem.getName(),userId,
+                UpdateUserMenu updateUserMenu = new UpdateUserMenu(menuNameText,userId,
                         customMenuItem.getCategory(),idRecipes);
                 updateMenuName(updateUserMenu,position);
                 notifyDataSetChanged();
@@ -158,8 +157,10 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
             public void onResponse(Call<PageDatumUserMenu> call, Response<PageDatumUserMenu> response) {
                 if(response.code() == 200){
                     menuList.set(position,response.body());
-                    Toast.makeText(activity.getApplicationContext(),"Pomyślnie zmienionoe nazwę menu ",
+                    Toast.makeText(activity.getApplicationContext(),"Pomyślnie zmieniono nazwę menu na "
+                            + updateUserMenu.getName(),
                             Toast.LENGTH_LONG).show();
+                    notifyDataSetChanged();
                 }
                 else {
                     Toast.makeText(activity.getApplicationContext(),"Błąd " + response.message(),
@@ -215,7 +216,6 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
                     public void onClick(DialogInterface dialog, int which) {
                         // delete text in result textview
                         deleteMenuName(position);
-                        menuList.remove(position);
                         notifyDataSetChanged();
                         dialog.dismiss();
                     }

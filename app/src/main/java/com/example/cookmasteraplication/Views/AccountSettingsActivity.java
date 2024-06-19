@@ -66,7 +66,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         deleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String userEmail = sharedPref.retrieveData("userEmail");
+                String userEmail = sharedPref.retrieveStringData("userEmail");
                 controler.showDeleteAccountDialogMsg(userEmail);
             }
         });

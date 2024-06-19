@@ -6,12 +6,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
-import com.example.cookmasteraplication.Utils.CommonTools;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.RegistrationActivity;
-import com.example.cookmasteraplication.api.Models.UserAccount;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IUserAccountService;
+import com.example.cookmasteraplication.Api.Models.UserAccount;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 

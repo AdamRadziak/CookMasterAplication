@@ -9,10 +9,10 @@ import com.example.cookmasteraplication.Adapters.RecyclerAdapterSavedMenu;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.Views.SavedMenuActivity;
-import com.example.cookmasteraplication.api.Models.GetUserMenu;
-import com.example.cookmasteraplication.api.Models.PageDatumUserMenu;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IUserMenuService;
+import com.example.cookmasteraplication.Api.Models.GetUserMenu;
+import com.example.cookmasteraplication.Api.Models.PageDatumUserMenu;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserMenuService;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -43,23 +43,12 @@ public class SavedMenuControler {
                 toolbar).create().setMenuOItemOnClickListeners().build();
     }
 
-    public void setRecyclerView(RecyclerView recyclerView) {
-        // crete example menu
-        recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
-        //get from shared preferences
+
+    public void ListUserMenus(RecyclerView recyclerView)
+    {
         String email = sharedPref.getUserEmail();
         String password = sharedPref.getUserPass();
         Integer IdUser = sharedPref.getUserId();
-        PageDatumList(IdUser,email,password);
-        RecyclerAdapterSavedMenu adapter = new RecyclerAdapterSavedMenu(menuList, activity, sharedPref);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-
-    }
-
-    private void PageDatumList(Integer IdUser,String email, String password)
-    {
-
         // get from shared preferences IdMenu
         Retrofit retrofitClient = BaseClient.get_AuthClient(email, password);
         IUserMenuService client = retrofitClient.create(IUserMenuService.class);
@@ -71,6 +60,9 @@ public class SavedMenuControler {
                 if(response.code()==200){
                     GetUserMenu menu = response.body();
                     menuList.addAll(menu.getPageData());
+                    recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
+                    RecyclerAdapterSavedMenu adapter = new RecyclerAdapterSavedMenu(menuList, activity, sharedPref);
+                    recyclerView.setAdapter(adapter);
 
                 }
                 else{

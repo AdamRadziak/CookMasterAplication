@@ -50,6 +50,8 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         recipeImage = findViewById(R.id.imageViewRecipe);
         productList = findViewById(R.id.productRecycler);
         stepList = findViewById(R.id.stepRecycler);
+        ratingBar.setMax(5);
+        ratingBar.setNumStars(5);
         controller = new RecipeDetailsControler(this);
 
         controller.setToolbarLogo(toolbarLogo, pageName);
@@ -58,9 +60,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         controller.getRecipeFromCard(intent);
         favouriteBtn.setOnClickListener(v -> controller.saveToFavourites());
         ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-            ratingBar.setMax(5);
-            ratingBar.setNumStars(5);
-            ratingBar.setStepSize(0.5F);
+            ratingBar.setRating(rating);
             controller.rateRecipe(rating);
         });
         controller.setName(recipeName);

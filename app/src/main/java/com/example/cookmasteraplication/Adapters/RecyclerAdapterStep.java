@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cookmasteraplication.R;
-import com.example.cookmasteraplication.api.Models.Step;
+import com.example.cookmasteraplication.Api.Models.Step;
 
 import java.util.ArrayList;
 import java.util.Locale;

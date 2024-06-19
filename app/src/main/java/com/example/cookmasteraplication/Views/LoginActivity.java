@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     Button signIn;
     Button passwordRemind;
     Button register;
-
+    ProgressBar progressBar;
     EditText userEmail;
     EditText userPassword;
     // controller class
@@ -45,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         userEmail = findViewById(R.id.editTextEmail);
         userPassword = findViewById(R.id.editTextPassword);
         toolbar = findViewById(R.id.toolbarLogin);
+        progressBar = findViewById(R.id.progressBarLogin);
         // instance of the class login controller
         controller = new LoginPageControler(this);
         sharedPref = new SharedPreferencesActivities(this);
@@ -52,8 +54,8 @@ public class LoginActivity extends AppCompatActivity {
         // build a toolbar properties
         controller.setToolbar(toolbar, pageName);
         // get data from password reminder controller shared preferences class
-        String reminderGetEmail = sharedPref.retrieveData("emailRemind");
-        String reminderGetPass = sharedPref.retrieveData("passRemind");
+        String reminderGetEmail = sharedPref.retrieveStringData("emailRemind");
+        String reminderGetPass = sharedPref.retrieveStringData("passRemind");
         if(!reminderGetPass.isEmpty() && !reminderGetEmail.isEmpty() ){
             // fill textinput
             userEmail.setText(reminderGetEmail);
@@ -63,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         signIn.setOnClickListener(v -> {
             intent.putExtra("email",userEmail.getText().toString());
             intent.putExtra("pass",userPassword.getText().toString());
-            isLogin = controller.goToMainPage(intent);
+            isLogin = controller.goToMainPage(intent,progressBar);
             if(!isLogin){
                 userEmail.setBackgroundColor(Color.RED);
                 userPassword.setBackgroundColor(Color.RED);

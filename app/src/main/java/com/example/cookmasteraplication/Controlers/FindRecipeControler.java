@@ -1,5 +1,7 @@
 package com.example.cookmasteraplication.Controlers;
 
+import static com.example.cookmasteraplication.Controlers.RecipeDetailsControler.GlobalRecipes;
+
 import android.content.Intent;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -11,14 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cookmasteraplication.Adapters.GridAdapterProductsFindRecipe;
 import com.example.cookmasteraplication.Adapters.RecyclerAdapterRecipe;
+import com.example.cookmasteraplication.Api.Models.ProductList;
+import com.example.cookmasteraplication.Api.Models.RecipeList;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.Views.FindRecipeActivity;
-import com.example.cookmasteraplication.api.Models.Product;
-import com.example.cookmasteraplication.api.Models.Recipe;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IProductService;
-import com.example.cookmasteraplication.api.Services.IRecipeService;
+import com.example.cookmasteraplication.Api.Models.Product;
+import com.example.cookmasteraplication.Api.Models.Recipe;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IProductService;
+import com.example.cookmasteraplication.Api.Services.IRecipeService;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -69,13 +73,14 @@ public class FindRecipeControler {
         // get products names from api
         Retrofit retrofitClient = BaseClient.get_AuthClient(sharedPref.getUserEmail(), sharedPref.getUserPass());
         IProductService client = retrofitClient.create(IProductService.class);
-        Call<List<Product>> call = client.GetProductList();
-        call.enqueue(new Callback<List<Product>>() {
+        Call<ProductList> call = client.GetProductList();
+        call.enqueue(new Callback<ProductList>() {
             @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+            public void onResponse(Call<ProductList> call, Response<ProductList> response) {
                 if (response.code() == 200) {
+                    List<Product> products = response.body().getPageData();
                     // add list of product names to grid adapter
-                    for (Product product : response.body()) {
+                    for (Product product : products) {
                         productNamesList.add(product.getName());
                     }
                 } else {
@@ -85,7 +90,7 @@ public class FindRecipeControler {
             }
 
             @Override
-            public void onFailure(Call<List<Product>> call, Throwable throwable) {
+            public void onFailure(Call<ProductList> call, Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),
                         "Błąd " + throwable.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -109,21 +114,23 @@ public class FindRecipeControler {
         gridAdapter.notifyDataSetChanged();
     }
 
-    public void searchRecipesByProducts() {
+    public void searchRecipesByProducts(RecyclerView recyclerView) {
         // get recipes names from api by query params filter and sorts by name
         Retrofit retrofitClient = BaseClient.get_AuthClient(sharedPref.getUserEmail(), sharedPref.getUserPass());
         IRecipeService client = retrofitClient.create(IRecipeService.class);
         // create query to filter
         String filterQuery ="";
         String sortQuery = "name";
-        Call<List<Recipe>> call = client.GetRecipeList(filterQuery,sortQuery);
-        call.enqueue(new Callback<List<Recipe>>() {
+        Call<RecipeList> call = client.GetRecipeList(filterQuery,sortQuery);
+        call.enqueue(new Callback<RecipeList>() {
             @Override
-            public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
+            public void onResponse(Call<RecipeList> call, Response<RecipeList> response) {
                 if(response.code() == 200){
-                    for(Recipe recipe: response.body()){
-                        recipeList.add(recipe);
-                    }
+                    GlobalRecipes.clear();
+                    GlobalRecipes.addAll(response.body().getRecipes());
+                    filterRecipe();
+                    setRecyclerView(recyclerView);
+
                 }
                 else{
                     Toast.makeText(activity.getApplicationContext(),
@@ -132,18 +139,15 @@ public class FindRecipeControler {
             }
 
             @Override
-            public void onFailure(Call<List<Recipe>> call, Throwable throwable) {
+            public void onFailure(Call<RecipeList> call, Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),
                         "Błąd " + throwable.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
-        // filter recipelist by product add
-        filterRecipe();
-
 
     }
 
-    private void filterRecipe(){
+    public void filterRecipe(){
         for(String productName : addingProducts){
                 for(Recipe recipe : recipeList){
                     List<Product> products = recipe.getProducts();

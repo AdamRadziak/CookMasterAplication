@@ -1,10 +1,8 @@
 package com.example.cookmasteraplication.Adapters;
 
-import static com.example.cookmasteraplication.Controlers.SavedMenuControler.menuList;
-
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +18,14 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cookmasteraplication.Api.Models.Recipe;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IRecipeService;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.R;
-import com.example.cookmasteraplication.Utils.CommonTools;
 import com.example.cookmasteraplication.Views.RecipeDetailsActivity;
-import com.example.cookmasteraplication.api.Models.Recipe;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IRecipeService;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,12 +38,13 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
 
     private final AppCompatActivity activity;
     private final SharedPreferencesActivities sharedPref;
-    private final ArrayList<Recipe> recipelist = new ArrayList<>();
+    private final List<Recipe> recipelist;
 
     public RecyclerAdapterFavouriteRecipe(AppCompatActivity activity,
-    SharedPreferencesActivities sharedPref) {
+    SharedPreferencesActivities sharedPref,List<Recipe> recipelist) {
         this.activity = activity;
         this.sharedPref = sharedPref;
+        this.recipelist = recipelist;
     }
 
     @NonNull
@@ -61,33 +58,11 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
 
     @Override
     public int getItemCount() {
-        return menuList.size();
+        return recipelist.size();
     }
 
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
-        // get list of favourite recipes by api
-        Retrofit retrofitClient = BaseClient.get_AuthClient(sharedPref.getUserEmail(), sharedPref.getUserPass());
-        IRecipeService client = retrofitClient.create(IRecipeService.class);
-        Call<List<Recipe>> call = client.ListFavoritesRecipeByUser(sharedPref.getUserEmail());
-        call.enqueue(new Callback<List<Recipe>>() {
-            @Override
-            public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
-                if(response.code()==200){
-                    recipelist.addAll(response.body());
-                }
-                else{
-                    Toast.makeText(activity.getApplicationContext(),
-                            "Błąd " + response.message(),Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Recipe>> call, Throwable throwable) {
-                Toast.makeText(activity.getApplicationContext(),
-                        "Błąd " + throwable.getMessage(),Toast.LENGTH_LONG).show();
-            }
-        });
         Recipe customMenuItem = recipelist.get(position);
         // string for labels
         String prepareTimeString = "Czas " + String.format(Locale.ENGLISH,
@@ -104,11 +79,11 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
         holder.FavouriteRecipeRate.setText(rateString);
         holder.FavouriteRecipePopular.setText(popularityString);
         // set drawable by first photo from recipe
-        byte[] imagebyte = customMenuItem.getPhotos().get(0)
-                .getData().getBytes(Charset.defaultCharset());
+        String imagebyte = customMenuItem.getPhotos().get(0)
+                .getData();
         // set drawable by first photo for recipe
-        Bitmap image = CommonTools.createImagefromBytes(imagebyte);
-        holder.imageViewFavouriteRecipe.setImageBitmap(image);
+        Drawable image = CommonTools.createImagefromBytes(imagebyte,activity);
+        holder.imageViewFavouriteRecipe.setImageDrawable(image);
         holder.cardViewFavouriteRecipe.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), RecipeDetailsActivity.class);
             intent.putExtra("cardPosition", position);
@@ -161,6 +136,7 @@ public class RecyclerAdapterFavouriteRecipe extends RecyclerView.Adapter<Recycle
                             "Pomyślnie usunięto przepis z ulubionych",Toast.LENGTH_LONG)
                             .show();
                     recipelist.remove(position);
+                    notifyDataSetChanged();
                 }
                 else{
                     Toast.makeText(activity.getApplicationContext(),

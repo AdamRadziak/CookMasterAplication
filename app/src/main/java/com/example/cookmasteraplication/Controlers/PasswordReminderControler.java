@@ -6,12 +6,12 @@ import android.widget.EditText;
 
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
-import com.example.cookmasteraplication.Utils.CommonTools;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.PasswordReminderActivity;
-import com.example.cookmasteraplication.api.Models.UserAccount;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IUserAccountService;
+import com.example.cookmasteraplication.Api.Models.UserAccount;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -56,8 +56,8 @@ public class PasswordReminderControler {
                         UserAccount body = response.body();
                         String emailDecode = CommonTools.decodeFromBase64String(body.getEmail());
                         String passDecode = CommonTools.decodeFromBase64String(body.getPassword());
-                        sharedPref.saveData("emailRemind",emailDecode);
-                        sharedPref.saveData("passRemind",passDecode);
+                        sharedPref.saveStringData("emailRemind",emailDecode);
+                        sharedPref.saveStringData("passRemind",passDecode);
                         Snackbar.make(layout, "hasło i email zostały przesłane na stronę logowania" , Snackbar.LENGTH_INDEFINITE)
                                 .setAction("Close", v -> {
 

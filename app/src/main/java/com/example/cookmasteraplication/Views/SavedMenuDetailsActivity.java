@@ -1,5 +1,6 @@
 package com.example.cookmasteraplication.Views;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -34,8 +35,8 @@ public class SavedMenuDetailsActivity extends AppCompatActivity {
 
         controller.setToolbarLogo(toolbarLogo, pageName);
         controller.setToolbarMenu(toolbarMenu);
-//        Intent intent = getIntent();
-//        controller.getMenuFromCard(intent, "cardPosition");
+        Intent intent = getIntent();
+        controller.getMenuFromCard(intent, "cardPosition");
         controller.setRecyclerView(recycler);
 
 

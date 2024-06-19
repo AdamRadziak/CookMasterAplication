@@ -34,7 +34,7 @@ public class SavedMenuActivity extends AppCompatActivity {
 
         controller.setToolbarLogo(toolbarLogo, pageName);
         controller.setToolbarMenu(toolbarMenu);
-        controller.setRecyclerView(recycler);
+        controller.ListUserMenus(recycler);
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.savedMenuLayout), (v, insets) -> {

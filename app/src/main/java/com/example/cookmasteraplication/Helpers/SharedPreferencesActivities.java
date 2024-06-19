@@ -13,8 +13,8 @@ public class SharedPreferencesActivities {
         this.activity = activity;
     }
 
-    public void saveData(String dataLabel, String dataValue) {
-        sharedPreferences = activity.getSharedPreferences("saveData", Context.MODE_PRIVATE);
+    public void saveStringData(String dataLabel, String dataValue) {
+        sharedPreferences = activity.getSharedPreferences("saveStringData", Context.MODE_PRIVATE);
 
         // save data to shared preferences
 
@@ -23,21 +23,22 @@ public class SharedPreferencesActivities {
         editor.apply();
     }
 
-    public String retrieveData(String dataLabel) {
-        sharedPreferences = activity.getSharedPreferences("saveData", Context.MODE_PRIVATE);
+
+    public String retrieveStringData(String dataLabel) {
+        sharedPreferences = activity.getSharedPreferences("saveStringData", Context.MODE_PRIVATE);
         return sharedPreferences.getString(dataLabel, "");
     }
 
     public String getUserEmail(){
-        return retrieveData("UserEmail");
+        return retrieveStringData("UserEmail");
     }
     public String getUserPass(){
-        return retrieveData("UserPass");
+        return retrieveStringData("UserPass");
     }
     public Integer getUserId(){
-        return Integer.parseInt(retrieveData("UserId"));
+        return Integer.parseInt(retrieveStringData("UserId"));
     }
     public Integer getMenuId(){
-        return Integer.parseInt(retrieveData("IdMenu"));
+        return Integer.parseInt(retrieveStringData("IdMenu"));
     }
 }

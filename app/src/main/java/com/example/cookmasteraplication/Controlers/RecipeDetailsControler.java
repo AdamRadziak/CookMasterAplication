@@ -1,6 +1,5 @@
 package com.example.cookmasteraplication.Controlers;
 
-import static com.example.cookmasteraplication.Controlers.CreateMenuController.menuListView;
 
 import android.content.Intent;
 import android.widget.ImageView;
@@ -15,14 +14,14 @@ import com.example.cookmasteraplication.Adapters.RecyclerAdapterProduct;
 import com.example.cookmasteraplication.Adapters.RecyclerAdapterStep;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
-import com.example.cookmasteraplication.Utils.CommonTools;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Views.RecipeDetailsActivity;
-import com.example.cookmasteraplication.api.Models.Product;
-import com.example.cookmasteraplication.api.Models.Recipe;
-import com.example.cookmasteraplication.api.Models.Step;
-import com.example.cookmasteraplication.api.Models.UpdateRecipe;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IRecipeService;
+import com.example.cookmasteraplication.Api.Models.Product;
+import com.example.cookmasteraplication.Api.Models.Recipe;
+import com.example.cookmasteraplication.Api.Models.Step;
+import com.example.cookmasteraplication.Api.Models.UpdateRecipe;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IRecipeService;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -35,19 +34,14 @@ import retrofit2.Retrofit;
 
 public class RecipeDetailsControler {
 
-    //    public static ArrayList<Recipe> favouriteRecipes = new ArrayList<>();
+    public static ArrayList<Recipe> GlobalRecipes = new ArrayList<>();
     private final RecipeDetailsActivity activity;
     private final String email;
     private final String password;
     private final Integer IdUser;
     private final SharedPreferencesActivities sharedPref;
-    private final ArrayList<Integer> productsAmounts = new ArrayList<>();
-    private final ArrayList<String> productsNames = new ArrayList<>();
-    private final ArrayList<String> productsAmountsUnits = new ArrayList<>();
-    private final ArrayList<Integer> stepsNumbers = new ArrayList<>();
-    private final ArrayList<String> stepsDescriptions = new ArrayList<>();
     private int cardItemPosition = 0;
-    private byte[] imageByte;
+    private String imageByte;
     private String recipeName;
     private Integer mealCount;
     private Integer prepareTime;
@@ -78,27 +72,21 @@ public class RecipeDetailsControler {
     public void getRecipeFromCard(@NonNull Intent intent) {
         // intent card item position
         cardItemPosition = intent.getExtras().getInt("cardPosition", 0);
-        imageByte = intent.getExtras().getByteArray("recipeImage");
+        imageByte = intent.getExtras().getString("recipeImage");
 
-        IdRecipe = menuListView.get(cardItemPosition).getId();
-        recipeName = menuListView.get(cardItemPosition).getName();
-        recipeCategory = menuListView.get(cardItemPosition).getCategory();
-        mealCount = menuListView.get(cardItemPosition).getMealCount();
-        prepareTime = menuListView.get(cardItemPosition).getPrepareTime();
-        rate = menuListView.get(cardItemPosition).getRate();
-        popularity = menuListView.get(cardItemPosition).getPopularity();
-        recipeDesc = menuListView.get(cardItemPosition).getDescription();
-        // arraylist with product names and steps
-//        productsNames = intent.getExtras().getStringArrayList("productsNames");
-//        productsAmountsUnits = intent.getExtras().getStringArrayList("productsAmountsUnits");
-//        stepsNumbers = intent.getExtras().getIntegerArrayList("stepsNumbers");
-//        stepsDescriptions = intent.getExtras().getStringArrayList("stepsDescriptions");
-
+        IdRecipe = GlobalRecipes.get(cardItemPosition).getId();
+        recipeName = GlobalRecipes.get(cardItemPosition).getName();
+        recipeCategory = GlobalRecipes.get(cardItemPosition).getCategory();
+        mealCount = GlobalRecipes.get(cardItemPosition).getMealCount();
+        prepareTime = GlobalRecipes.get(cardItemPosition).getPrepareTime();
+        rate = GlobalRecipes.get(cardItemPosition).getRate();
+        popularity = GlobalRecipes.get(cardItemPosition).getPopularity();
+        recipeDesc = GlobalRecipes.get(cardItemPosition).getDescription();
     }
 
 
     public void setProductList(@NonNull RecyclerView recyclerView) {
-        ArrayList<Product> products = new ArrayList<>(menuListView.get(cardItemPosition).getProducts());
+        ArrayList<Product> products = new ArrayList<>(GlobalRecipes.get(cardItemPosition).getProducts());
         recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
         RecyclerAdapterProduct adapter = new RecyclerAdapterProduct(products, activity);
         recyclerView.setAdapter(adapter);
@@ -106,7 +94,7 @@ public class RecipeDetailsControler {
     }
 
     public void setStepList(@NonNull RecyclerView recyclerView) {
-        ArrayList<Step> steps = new ArrayList<>(menuListView.get(cardItemPosition).getSteps());
+        ArrayList<Step> steps = new ArrayList<>(GlobalRecipes.get(cardItemPosition).getSteps());
         recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
         RecyclerAdapterStep adapter = new RecyclerAdapterStep(steps, activity);
         recyclerView.setAdapter(adapter);
@@ -146,12 +134,11 @@ public class RecipeDetailsControler {
     public void saveToFavourites() {
         Retrofit retrofitClient = BaseClient.get_AuthClient(email, password);
         IRecipeService client = retrofitClient.create(IRecipeService.class);
-        Call<Recipe> call = client.AddRecipe2Favourites(IdRecipe, email);
+        Call<Recipe> call = client.AddRecipe2Favourites(IdRecipe, IdUser);
         call.enqueue(new Callback<Recipe>() {
             @Override
             public void onResponse(Call<Recipe> call, Response<Recipe> response) {
                 if (response.code() == 200) {
-//                    favouriteRecipes.add(response.body());
                     Toast.makeText(activity.getApplicationContext(), "Dodałeś przepis  "
                             + recipeName + " do ulubionych", Toast.LENGTH_LONG).show();
 
@@ -171,6 +158,7 @@ public class RecipeDetailsControler {
     }
 
     public void rateRecipe(float Userrate) {
+        final boolean[] fromUser = {false};
         // this function sends api rate by user
         UpdateRecipe updateRecipe = new UpdateRecipe(recipeName, recipeCategory, prepareTime,
                 mealCount, (double) Userrate, popularity, recipeDesc);
@@ -184,10 +172,11 @@ public class RecipeDetailsControler {
                     rate = response.body().getRate();
                     Toast.makeText(activity.getApplicationContext(), "Oceniłeś przepis na  " + Userrate +
                             " gwiazdek", Toast.LENGTH_LONG).show();
-                    activity.recreate();
+                    fromUser[0] =true;
                 } else {
                     Toast.makeText(activity.getApplicationContext(),
                             "Błąd " + response.message(), Toast.LENGTH_LONG).show();
+                    fromUser[0] =true;
                 }
             }
 
@@ -195,13 +184,13 @@ public class RecipeDetailsControler {
             public void onFailure(Call<Recipe> call, Throwable throwable) {
                 Toast.makeText(activity.getApplicationContext(),
                         "Błąd " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                fromUser[0] =true;
             }
         });
-
     }
 
     public void setMealImage(ImageView image) {
-        image.setImageBitmap(CommonTools.createImagefromBytes(imageByte));
+        image.setImageDrawable(CommonTools.createImagefromBytes(imageByte,activity));
     }
 
 

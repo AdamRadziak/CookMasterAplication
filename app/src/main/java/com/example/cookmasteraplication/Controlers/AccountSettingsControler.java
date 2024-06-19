@@ -9,12 +9,12 @@ import androidx.appcompat.app.AlertDialog;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.R;
-import com.example.cookmasteraplication.Utils.CommonTools;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Views.AccountSettingsActivity;
 import com.example.cookmasteraplication.Views.LoginActivity;
-import com.example.cookmasteraplication.api.Models.UserAccount;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IUserAccountService;
+import com.example.cookmasteraplication.Api.Models.UserAccount;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import retrofit2.Call;
@@ -49,26 +49,26 @@ public class AccountSettingsControler {
         // get api to update the password
         if (pass_get != null) {
             String NewpassEncode = CommonTools.encode2Base64String(pass_get);
-            String emailEncode = CommonTools.encode2Base64String(sharedPref.retrieveData("UserEmail"));
+            String emailEncode = CommonTools.encode2Base64String(sharedPref.retrieveStringData("UserEmail"));
             // retreive data by sharedPreferences
             UserAccount userAccount = new UserAccount(emailEncode, NewpassEncode);
             retrofitClient = BaseClient
-                    .get_AuthClient(sharedPref.retrieveData("UserEmail"),
-                            sharedPref.retrieveData("UserPass"));
+                    .get_AuthClient(sharedPref.retrieveStringData("UserEmail"),
+                            sharedPref.retrieveStringData("UserPass"));
             IUserAccountService client = retrofitClient.create(IUserAccountService.class);
             Call<UserAccount> call = client.UpdateUserPass(userAccount,
-                    Integer.parseInt(sharedPref.retrieveData("UserId")));
+                    Integer.parseInt(sharedPref.retrieveStringData("UserId")));
             call.enqueue(new Callback<UserAccount>() {
                 @Override
                 public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
                     if (response.code() == 200) {
                         Toast.makeText(activity.getApplicationContext(),
                                 "Pomyślnie zmieniono hasło dla użytkownika " +
-                                        sharedPref.retrieveData("UserEmail"),
+                                        sharedPref.retrieveStringData("UserEmail"),
                                 Toast.LENGTH_LONG).show();
                         isPasswordChanged[0] = true;
                         // add to sharedPreferences class new value of password
-                        sharedPref.saveData("UserPass",pass_get);
+                        sharedPref.saveStringData("UserPass",pass_get);
 
                     } else {
                         Toast.makeText(activity.getApplicationContext(),
@@ -93,10 +93,10 @@ public class AccountSettingsControler {
     private void deleteAccount(String userEmail) {
         if (userEmail != null) {
             // use api to delete user
-            Integer UserId = Integer.parseInt(sharedPref.retrieveData("UserId"));
+            Integer UserId = Integer.parseInt(sharedPref.retrieveStringData("UserId"));
             retrofitClient = BaseClient
-                    .get_AuthClient(sharedPref.retrieveData("UserEmail"),
-                            sharedPref.retrieveData("UserPass"));
+                    .get_AuthClient(sharedPref.retrieveStringData("UserEmail"),
+                            sharedPref.retrieveStringData("UserPass"));
             IUserAccountService client = retrofitClient.create(IUserAccountService.class);
             Call<UserAccount> call = client.DeleteUser(UserId);
             call.enqueue(new Callback<UserAccount>() {

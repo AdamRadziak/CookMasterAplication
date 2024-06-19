@@ -1,5 +1,7 @@
 package com.example.cookmasteraplication.Controlers;
 
+import static com.example.cookmasteraplication.Controlers.RecipeDetailsControler.GlobalRecipes;
+
 import android.content.Intent;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -14,11 +16,11 @@ import com.example.cookmasteraplication.Adapters.RecyclerAdapterMenu;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
 import com.example.cookmasteraplication.Views.CreateMenuActivity;
-import com.example.cookmasteraplication.api.Models.GenerateUserMenu;
-import com.example.cookmasteraplication.api.Models.PageDatumUserMenu;
-import com.example.cookmasteraplication.api.Models.Recipe;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IUserMenuService;
+import com.example.cookmasteraplication.Api.Models.GenerateUserMenu;
+import com.example.cookmasteraplication.Api.Models.PageDatumUserMenu;
+import com.example.cookmasteraplication.Api.Models.Recipe;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserMenuService;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -110,15 +112,16 @@ public class CreateMenuController {
                 @Override
                 public void onResponse(Call<PageDatumUserMenu> call, Response<PageDatumUserMenu> response) {
                     if (response.code() == 201){
+                        // delete all from GlobalRecipes
+                        GlobalRecipes.clear();
                         List<Recipe> body = response.body().getRecipes();
-                        menuListView.addAll(body);
-//                        sharedPref.saveData("IdMenu",body.getId().toString());
+                        GlobalRecipes.addAll(body);
                         Toast.makeText(activity.getApplicationContext(),"Pomyślnie wygenerowano menu" +
                                 "o nazwie " + menuName,Toast.LENGTH_LONG).show();
                         isSuccess[0] = true;
                         // set recycler view
                         recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
-                        RecyclerAdapterMenu adapter = new RecyclerAdapterMenu(menuListView, activity);
+                        RecyclerAdapterMenu adapter = new RecyclerAdapterMenu(GlobalRecipes, activity);
                         recyclerView.setAdapter(adapter);
 
                     }

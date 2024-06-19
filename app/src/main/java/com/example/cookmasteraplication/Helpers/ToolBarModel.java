@@ -13,7 +13,15 @@ import com.example.cookmasteraplication.Views.FavouritesRecipesActivity;
 import com.example.cookmasteraplication.Views.FindRecipeActivity;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.SavedMenuActivity;
+import com.example.cookmasteraplication.Api.Models.UserAccount;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 final public class ToolBarModel {
 
@@ -42,7 +50,8 @@ final public class ToolBarModel {
 
 
         public Builder setOverflowIcon() {
-            toolbar.setOverflowIcon(AppCompatResources.getDrawable(activity.getApplicationContext(), R.drawable.menu_icon));
+            toolbar.setOverflowIcon(AppCompatResources.getDrawable(activity.getApplicationContext(),
+                    R.drawable.menu_icon));
             return this;
         }
 
@@ -80,8 +89,8 @@ final public class ToolBarModel {
 
                 } else if (item.getItemId() == R.id.signOutMenuItem) {
                     Toast.makeText(activity.getApplicationContext(), "logout menu item", Toast.LENGTH_SHORT).show();
-                    Intent loginIntent = new Intent(activity.getApplicationContext(), LoginActivity.class);
-                    activity.startActivity(loginIntent);
+                    logout();
+
                 } else if (item.getItemId() == R.id.backMenuItem) {
                     Toast.makeText(activity.getApplicationContext(), "Back menu item", Toast.LENGTH_SHORT).show();
                     activity.finish();
@@ -92,6 +101,35 @@ final public class ToolBarModel {
             return this;
         }
 
+        private void logout(){
+            // put empty string as password to auth end email from user
+            Retrofit retrofitClient = BaseClient.get_AuthClient("","");
+            IUserAccountService client = retrofitClient.create(IUserAccountService.class);
+            Call<UserAccount> call = client.LogIn("","");
+            call.enqueue(new Callback<UserAccount>() {
+                @Override
+                public void onResponse(Call<UserAccount> call, Response<UserAccount> response) {
+                    if(response.code()==404){
+                        Toast.makeText(activity.getApplicationContext(),"Pomyślnie wylogowano",
+                                Toast.LENGTH_LONG).show();
+                        Intent loginIntent = new Intent(activity.getApplicationContext(), LoginActivity.class);
+                        activity.startActivity(loginIntent);
+                    }else{
+                        Toast.makeText(activity.getApplicationContext(),
+                                "Błąd " + response.message(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserAccount> call, Throwable throwable) {
+                    Toast.makeText(activity.getApplicationContext(),
+                            "Błąd " + throwable.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+
+        }
         public Builder create() {
             return new Builder(this.activity, this.toolbar);
         }

@@ -1,9 +1,7 @@
 package com.example.cookmasteraplication.Adapters;
 
-import static com.example.cookmasteraplication.Adapters.RecyclerAdapterMenu.productsAmounts;
-
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,26 +15,18 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cookmasteraplication.Api.Models.Recipe;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.R;
-import com.example.cookmasteraplication.Utils.CommonTools;
 import com.example.cookmasteraplication.Views.RecipeDetailsActivity;
-import com.example.cookmasteraplication.api.Models.Product;
-import com.example.cookmasteraplication.api.Models.Recipe;
-import com.example.cookmasteraplication.api.Models.Step;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class RecyclerAdapterRecipe extends RecyclerView.Adapter<RecyclerAdapterRecipe.MenuViewHolder> {
 
     private final ArrayList<Recipe> recipeList;
     private final AppCompatActivity activity;
-    private final ArrayList<String> productsAmountsUnits = new ArrayList<>();
-    private final ArrayList<Integer> stepsNumbers = new ArrayList<>();
-    private final ArrayList<String> stepsDescriptions = new ArrayList<>();
-    public ArrayList<String> productsNames = new ArrayList<>();
 
     public RecyclerAdapterRecipe(ArrayList<Recipe> recipeList, AppCompatActivity activity) {
         this.recipeList = recipeList;
@@ -74,44 +64,18 @@ public class RecyclerAdapterRecipe extends RecyclerView.Adapter<RecyclerAdapterR
         holder.RecipeRate.setText(rateString);
         holder.RecipePopular.setText(popularityString);
         // set drawable by first photo for recipe
-        byte[] imagebyte = customMenuItem.getPhotos().get(0)
-                .getData().getBytes(Charset.defaultCharset());
-        Bitmap image = CommonTools.createImagefromBytes(imagebyte);
-        holder.imageViewRecipe.setImageBitmap(image);
+        String imagebyte = customMenuItem.getPhotos().get(0)
+                .getData();
+        Drawable image = CommonTools.createImagefromBytes(imagebyte,activity);
+        holder.imageViewRecipe.setImageDrawable(image);
         // get product list and steps list
-        List<Product> products = customMenuItem.getProducts();
-        List<Step> steps = customMenuItem.getSteps();
-        // foreach recipes get steps and products
-        for (Product product : products
-        ) {
-            productsNames.add(product.getName());
-            productsAmounts.add(product.getAmount());
-            productsAmountsUnits.add(product.getUnit());
-
-        }
-        for(Step step: steps){
-            stepsNumbers.add(step.getStepNum());
-            stepsDescriptions.add(step.getDescription());
-        }
 
         holder.cardViewRecipe.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), RecipeDetailsActivity.class);
             Bundle bundle = new Bundle();
             bundle.putInt("cardPosition", position);
-            bundle.putInt("IdRecipe", customMenuItem.getId());
-            bundle.putString("recipeCategory", customMenuItem.getCategory());
-            bundle.putByteArray("recipeImage", imagebyte);
-            bundle.putString("recipeName", customMenuItem.getName());
-            bundle.putInt("mealCount", customMenuItem.getMealCount());
-            bundle.putInt("prepareTime", customMenuItem.getPrepareTime());
-            bundle.putDouble("rate", customMenuItem.getRate());
-            bundle.putDouble("popularity", customMenuItem.getPopularity());
-            bundle.putString("recipeDesc", customMenuItem.getDescription());
-
-            bundle.putStringArrayList("productsNames", productsNames);
-            bundle.putStringArrayList("productsAmountsUnits", productsAmountsUnits);
-            bundle.putIntegerArrayList("stepsNumbers", stepsNumbers);
-            bundle.putStringArrayList("stepsDescriptions", stepsDescriptions);
+            bundle.putString("recipeImage", imagebyte);
+            // put extras by bundle
             intent.putExtras(bundle);
             activity.startActivity(intent);
         });

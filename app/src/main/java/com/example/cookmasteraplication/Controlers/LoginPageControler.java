@@ -1,19 +1,21 @@
 package com.example.cookmasteraplication.Controlers;
 
 import android.content.Intent;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.cookmasteraplication.Models.AccountInfoModel;
 import com.example.cookmasteraplication.Helpers.SharedPreferencesActivities;
 import com.example.cookmasteraplication.Helpers.ToolBarModel;
-import com.example.cookmasteraplication.Utils.CommonTools;
+import com.example.cookmasteraplication.Helpers.CommonTools;
 import com.example.cookmasteraplication.Views.CreateMenuActivity;
 import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.PasswordReminderActivity;
 import com.example.cookmasteraplication.Views.RegistrationActivity;
-import com.example.cookmasteraplication.api.Models.UserAccount;
-import com.example.cookmasteraplication.api.RetrofitClients.BaseClient;
-import com.example.cookmasteraplication.api.Services.IUserAccountService;
+import com.example.cookmasteraplication.Api.Models.UserAccount;
+import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
+import com.example.cookmasteraplication.Api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -45,9 +47,11 @@ public class LoginPageControler {
         activity.startActivity(intent);
     }
 
-    public boolean goToMainPage(Intent intent) {
+    public boolean goToMainPage(Intent intent, ProgressBar progressBar) {
         final boolean[] isLogin = {true};
         int statusCode;
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
         // verify that email and password is correct
         String email_get = intent.getStringExtra("email");
         String password_get = intent.getStringExtra("pass");
@@ -68,15 +72,19 @@ public class LoginPageControler {
                         String emailDecode = CommonTools.decodeFromBase64String(body.getEmail());
                         String passDecode = CommonTools.decodeFromBase64String(body.getPassword());
                         // save to shared preferences class
-                        sharedPref.saveData("UserId",body.getId().toString());
-                        sharedPref.saveData("UserEmail",emailDecode);
-                        sharedPref.saveData("UserPass",passDecode);
+                        sharedPref.saveStringData("UserId",body.getId().toString());
+                        sharedPref.saveStringData("UserEmail",emailDecode);
+                        sharedPref.saveStringData("UserPass",passDecode);
+                        progressBar.setIndeterminate(false);
+                        progressBar.setVisibility(View.INVISIBLE);
                         Toast.makeText(activity.getApplicationContext(), "Poprawnie zalogowano", Toast.LENGTH_SHORT).show();
                         Intent MainPageIntent = new Intent(activity.getApplicationContext(), CreateMenuActivity.class);
                         activity.startActivity(MainPageIntent);
                         isLogin[0] = true;
                     } else {
                         Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + response.message(), Toast.LENGTH_LONG).show();
+                        progressBar.setIndeterminate(false);
+                        progressBar.setVisibility(View.INVISIBLE);
                         isLogin[0] = false;
                     }
                 }
@@ -84,6 +92,8 @@ public class LoginPageControler {
                 @Override
                 public void onFailure(Call<UserAccount> call, Throwable throwable) {
                     Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                    progressBar.setIndeterminate(false);
+                    progressBar.setVisibility(View.INVISIBLE);
                     isLogin[0] = false;
                 }
             });
