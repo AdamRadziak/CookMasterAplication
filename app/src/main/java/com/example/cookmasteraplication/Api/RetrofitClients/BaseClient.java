@@ -13,7 +13,7 @@ public class BaseClient {
     public static Retrofit get_client() {
         // Create a new object from HttpLoggingInterceptor
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        interceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
                 .readTimeout(12, TimeUnit.SECONDS)
