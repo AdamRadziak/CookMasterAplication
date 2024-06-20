@@ -81,6 +81,7 @@ public class RecyclerAdapterSavedMenu extends RecyclerView.Adapter<RecyclerAdapt
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
         PageDatumUserMenu customMenuItem = menuList.get(position);
+//        GlobalRecipes.addAll(customMenuItem.getRecipes());
         holder.savedMenuTitle.setText(customMenuItem.getName());
         // menu titles
         List<Recipe> recipes = customMenuItem.getRecipes();

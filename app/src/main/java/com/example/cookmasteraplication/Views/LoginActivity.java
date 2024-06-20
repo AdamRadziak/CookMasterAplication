@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import androidx.activity.EdgeToEdge;
@@ -26,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     ProgressBar progressBar;
     EditText userEmail;
     EditText userPassword;
+    LinearLayout layout;
     // controller class
     LoginPageControler controller;
     SharedPreferencesActivities sharedPref;
@@ -47,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         userPassword = findViewById(R.id.editTextPassword);
         toolbar = findViewById(R.id.toolbarLogin);
         progressBar = findViewById(R.id.progressBarLogin);
+        layout = findViewById(R.id.loginLayout);
         // instance of the class login controller
         controller = new LoginPageControler(this,progressBar);
         sharedPref = new SharedPreferencesActivities(this);
@@ -65,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
         signIn.setOnClickListener(v -> {
             intent.putExtra("email",userEmail.getText().toString());
             intent.putExtra("pass",userPassword.getText().toString());
-            isLogin = controller.goToMainPage(intent);
+            isLogin = controller.goToMainPage(intent,layout);
             if(!isLogin){
                 userEmail.setBackgroundColor(Color.RED);
                 userPassword.setBackgroundColor(Color.RED);

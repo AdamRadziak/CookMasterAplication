@@ -6,15 +6,17 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 
-import com.example.cookmasteraplication.Helpers.ToolBarModel;
-import com.example.cookmasteraplication.Helpers.CommonTools;
-import com.example.cookmasteraplication.Views.LoginActivity;
-import com.example.cookmasteraplication.Views.RegistrationActivity;
 import com.example.cookmasteraplication.Api.Models.UserAccount;
 import com.example.cookmasteraplication.Api.RetrofitClients.BaseClient;
 import com.example.cookmasteraplication.Api.Services.IUserAccountService;
+import com.example.cookmasteraplication.Helpers.CommonTools;
+import com.example.cookmasteraplication.Helpers.ToolBarModel;
+import com.example.cookmasteraplication.Views.LoginActivity;
+import com.example.cookmasteraplication.Views.RegistrationActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,7 +47,7 @@ public class RegistrationControler {
         String email_get = intent.getStringExtra("email");
         String password_get = intent.getStringExtra("pass");
         // encode pass and email to base64
-        if (email_get != null && password_get != null) {
+        if (!email_get.isEmpty() && !password_get.isEmpty()) {
             progressBar.setVisibility(View.VISIBLE);
             progressBar.setIndeterminate(true);
             String emailHash = CommonTools.encode2Base64String(email_get);
@@ -69,10 +71,16 @@ public class RegistrationControler {
                     else{
                         progressBar.setVisibility(View.INVISIBLE);
                         progressBar.setIndeterminate(false);
-                        Snackbar.make(layout, "NIe utworzono użytkownika " + email_get + " " + response.message(), Snackbar.LENGTH_INDEFINITE)
+                        String msg = null;
+                        try {
+                            msg = response.errorBody().string();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        Snackbar.make(layout, msg, Snackbar.LENGTH_INDEFINITE)
                                 .setAction("Zamknij", v -> {
 
-                                }).show();}
+                                }).setTextMaxLines(100).show();}
                     }
                 @Override
                 public void onFailure(@NonNull Call<UserAccount> call, @NonNull Throwable t) {
@@ -81,7 +89,7 @@ public class RegistrationControler {
                     Snackbar.make(layout, "Niepowodzenie w rejestracji użytkownika" + email_get + " " + t.getMessage(), Snackbar.LENGTH_INDEFINITE)
                             .setAction("Zamknij", v -> {
 
-                            }).show();
+                            }).setTextMaxLines(100).show();
                     call.cancel();
                 }
             });

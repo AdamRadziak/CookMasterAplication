@@ -18,6 +18,9 @@ import com.example.cookmasteraplication.Views.LoginActivity;
 import com.example.cookmasteraplication.Views.PasswordReminderActivity;
 import com.example.cookmasteraplication.Views.RegistrationActivity;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,14 +53,14 @@ public class LoginPageControler {
         activity.startActivity(intent);
     }
 
-    public boolean goToMainPage(Intent intent) {
-        final boolean[] isLogin = {true};
+    public boolean goToMainPage(Intent intent, View layout) {
+        final boolean[] isLogin = {false};
         progressBar.setVisibility(View.VISIBLE);
         progressBar.setIndeterminate(true);
         // verify that email and password is correct
         String email_get = intent.getStringExtra("email");
         String password_get = intent.getStringExtra("pass");
-        if (email_get != null && password_get != null) {
+        if (!email_get.isEmpty() && !password_get.isEmpty()) {
             // authorize by headers
             Retrofit retrofitClient = BaseClient.get_AuthClient(email_get, password_get);
             IUserAccountService client = retrofitClient.create(IUserAccountService.class);
@@ -70,41 +73,55 @@ public class LoginPageControler {
                 public void onResponse(@NonNull Call<UserAccount> call, @NonNull Response<UserAccount> response) {
                     if (response.code() == 200) {
                         // add to GetUserAccount class
-                        if(response.body() != null){
-                        UserAccount body = response.body();
-                        String emailDecode = CommonTools.decodeFromBase64String(body.getEmail());
-                        String passDecode = CommonTools.decodeFromBase64String(body.getPassword());
-                        // save to shared preferences class
-                        sharedPref.saveStringData("UserId",body.getId().toString());
-                        sharedPref.saveStringData("UserEmail",emailDecode);
-                        sharedPref.saveStringData("UserPass",passDecode);
-                        progressBar.setIndeterminate(false);
-                        progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(activity.getApplicationContext(), "Poprawnie zalogowano", Toast.LENGTH_SHORT).show();
-                        Intent MainPageIntent = new Intent(activity.getApplicationContext(), CreateMenuActivity.class);
-                        activity.startActivity(MainPageIntent);
-                        isLogin[0] = true;}
-                        else{
-                            Toast.makeText(activity.getApplicationContext(), "Nie można pobrać zawartości ",Toast.LENGTH_LONG).show();
+                        if (response.body() != null) {
+                            UserAccount body = response.body();
+                            String emailDecode = CommonTools.decodeFromBase64String(body.getEmail());
+                            String passDecode = CommonTools.decodeFromBase64String(body.getPassword());
+                            // save to shared preferences class
+                            sharedPref.saveStringData("UserId", body.getId().toString());
+                            sharedPref.saveStringData("UserEmail", emailDecode);
+                            sharedPref.saveStringData("UserPass", passDecode);
+                            progressBar.setIndeterminate(false);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(activity.getApplicationContext(), "Poprawnie zalogowano", Toast.LENGTH_SHORT).show();
+                            Intent MainPageIntent = new Intent(activity.getApplicationContext(), CreateMenuActivity.class);
+                            activity.startActivity(MainPageIntent);
+                            isLogin[0] = true;
+                        } else {
+                            Toast.makeText(activity.getApplicationContext(), "Nie można pobrać zawartości ", Toast.LENGTH_LONG).show();
                         }
                     } else {
                         progressBar.setIndeterminate(false);
                         progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + response.message(), Toast.LENGTH_LONG).show();
+                        String msg = null;
+                        try {
+                            msg = response.errorBody().string();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        Snackbar.make(layout, msg, Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Zamknij", v -> {
+
+                                }).setTextMaxLines(100).show();
                         isLogin[0] = false;
                     }
                 }
+
 
                 @Override
                 public void onFailure(@NonNull Call<UserAccount> call, @NonNull Throwable throwable) {
                     progressBar.setIndeterminate(false);
                     progressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(activity.getApplicationContext(), "Błąd logowania " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                    Snackbar.make(layout, throwable.getMessage(), Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Zamknij", v -> {
+
+                            }).setTextMaxLines(100).show();
                     isLogin[0] = false;
                 }
             });
         }
-
+        progressBar.setIndeterminate(false);
+        progressBar.setVisibility(View.INVISIBLE);
 
         return isLogin[0];
     }

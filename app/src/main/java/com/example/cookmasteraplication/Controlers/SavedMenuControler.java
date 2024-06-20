@@ -1,5 +1,7 @@
 package com.example.cookmasteraplication.Controlers;
 
+import static com.example.cookmasteraplication.Controlers.RecipeDetailsControler.GlobalRecipes;
+
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -67,10 +69,11 @@ public class SavedMenuControler {
         call.enqueue(new Callback<GetUserMenu>() {
             @Override
             public void onResponse(@NonNull Call<GetUserMenu> call, @NonNull Response<GetUserMenu> response) {
-                menuList.clear();
                 if(response.code()==200){
                     if(response.body() != null){
-                    GetUserMenu menu = response.body();
+                        menuList.clear();
+                        GlobalRecipes.clear();
+                        GetUserMenu menu = response.body();
                     menuList.addAll(menu.getPageData());
                     recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
                     RecyclerAdapterSavedMenu adapter = new RecyclerAdapterSavedMenu(menuList, activity, sharedPref);

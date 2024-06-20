@@ -19,6 +19,8 @@ import com.example.cookmasteraplication.Api.Services.IUserAccountService;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.IOException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -83,10 +85,16 @@ public class PasswordReminderControler {
                     }else {
                         progressBar.setVisibility(View.INVISIBLE);
                         progressBar.setIndeterminate(false);
-                        Snackbar.make(layout, "błąd" + response.message(), Snackbar.LENGTH_INDEFINITE)
-                                .setAction("Close", v -> {
+                        String msg = null;
+                        try {
+                            msg = response.errorBody().string();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        Snackbar.make(layout, msg, Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Zamknij", v -> {
 
-                                }).show();
+                                }).setTextMaxLines(100).show();
                     }
                 }
 
@@ -107,7 +115,7 @@ public class PasswordReminderControler {
             Snackbar.make(layout, "nie wpisano maila", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Close", v -> {
 
-                    }).show();
+                    }).setTextMaxLines(100).show();
         }
     }
 

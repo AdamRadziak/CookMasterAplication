@@ -63,8 +63,9 @@ public class FavouritesRecipesControler {
             @Override
             public void onResponse(@NonNull Call<RecipeList> call, @NonNull Response<RecipeList> response) {
                 if(response.code()==200){
-                    GlobalRecipes.clear();
                     if(response.body().getRecipes() != null){
+
+                    GlobalRecipes.clear();
                     GlobalRecipes.addAll(response.body().getRecipes());
                     // set adapter
                     recyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
