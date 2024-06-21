@@ -119,6 +119,11 @@ public class LoginPageControler {
                     isLogin[0] = false;
                 }
             });
+        }else{
+            Snackbar.make(layout, "Nieprawidłowy email lub hasło", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Zamknij", v -> {
+
+                    }).setTextMaxLines(100).show();
         }
         progressBar.setIndeterminate(false);
         progressBar.setVisibility(View.INVISIBLE);

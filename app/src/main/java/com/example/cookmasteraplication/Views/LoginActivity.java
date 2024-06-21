@@ -69,12 +69,7 @@ public class LoginActivity extends AppCompatActivity {
             intent.putExtra("email",userEmail.getText().toString());
             intent.putExtra("pass",userPassword.getText().toString());
             isLogin = controller.goToMainPage(intent,layout);
-            if(!isLogin){
-                userEmail.setBackgroundColor(Color.RED);
-                userPassword.setBackgroundColor(Color.RED);
-                userEmail.setHint("Wpisz poprawny email");
-                userPassword.setHint("Wpisz poprawne hasło");
-            }
+
         });
         passwordRemind.setOnClickListener(v -> controller.goToPasswordReminderPage());
         register.setOnClickListener(v -> controller.goToRegisterPage());
