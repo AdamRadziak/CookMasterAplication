@@ -70,7 +70,7 @@ public class SavedMenuControler {
             @Override
             public void onResponse(@NonNull Call<GetUserMenu> call, @NonNull Response<GetUserMenu> response) {
                 if(response.code()==200){
-                    if(response.body() != null){
+                    if(response.body().getPageData() != null){
                         menuList.clear();
                         GlobalRecipes.clear();
                         GetUserMenu menu = response.body();
